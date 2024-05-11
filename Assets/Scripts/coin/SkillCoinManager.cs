@@ -1,48 +1,70 @@
 ﻿using UnityEngine;
+using System.Collections;
 
-namespace coin
+public class SkillCoinManager : MonoBehaviour
 {
-    public class SkillCoinManager : MonoBehaviour
+    public static SkillCoinManager instance;
+
+    public GameObject skillCoinPrefab;  // Prefab for the Skill Coin
+    public Transform bossTransform;     // Reference to the boss's transform
+    public float spawnRadius = 15.0f;   // Radius around the boss within which coins can appear
+    private GameObject currentSkillCoin = null;
+
+    private void Awake()
     {
-        public GameObject skillCoinPrefab;
-        private GameObject currentSkillCoin;
-        private float timer;
-        private float spawnInterval = 60; // Interval to spawn skill coins
-        private Vector3 centerPosition;
-        private bool isCoinGenerated = false;
-        void Start()
-        {
-        }
+        instance = this;
+    }
 
-        void Update()
+    
+    private void Start()
+    {
+        StartCoroutine(SpawnSkillCoinRoutine());
+    }
+
+    IEnumerator SpawnSkillCoinRoutine()
+    {
+        while (true)
         {
-            if (GameManager.instance.curStatus == Status.Game)
+            if (currentSkillCoin == null)
             {
-                if (GameManager.instance.curStatus == Status.Game && !isCoinGenerated)
-                {
-                    GameObject centerBlock = GameObject.Find("MapBlock_20_1_20");
-                    if (centerBlock != null)
-                    {
-                        centerPosition = centerBlock.transform.position;
-                    }
-                    else
-                    {
-                        Debug.LogError("Center block 'MapBlock_20_1_20' not found. Using default center.");
-                        centerPosition = new Vector3(20, 1, 20); // Default if center block not found
-                    }
-
-                    isCoinGenerated = true;
-                }
-
-                timer += Time.deltaTime;
-                if (timer >= spawnInterval && currentSkillCoin == null)
-                {
-                    Vector3 spawnPosition =
-                        centerPosition + new Vector3(Random.Range(-10, 11), 0.25f, Random.Range(-10, 11));
-                    currentSkillCoin = Instantiate(skillCoinPrefab, spawnPosition, Quaternion.identity);
-                    timer = 0; // Reset timer after spawning
-                }
+                yield return new WaitForSeconds(Random.Range(10, 20)); // Wait between 10 to 30 seconds
+                SpawnSkillCoin();
             }
+            yield return null;
         }
+    }
+
+    void SpawnSkillCoin()
+    {
+        Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
+        randomDirection.y = 0; // 确保硬币在地面高度生成
+
+        Vector3 spawnLocation = bossTransform.position + randomDirection + new Vector3(0, 0.5f, 0);
+        currentSkillCoin = Instantiate(skillCoinPrefab, spawnLocation, Quaternion.identity);
+
+        
+    }
+
+
+    public void CoinCollected()
+    {
+       
+        if (currentSkillCoin != null)
+        {
+            UIManager.instance.ShowCoinCollectedAnimation(currentSkillCoin.transform.position); // Displays the collection animation
+            Destroy(currentSkillCoin);
+            currentSkillCoin = null;
+            SaveCoinData();
+        }
+    }
+
+
+    void SaveCoinData()
+    {
+        // Saves the incremented count of collected coins
+        int coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0) + 1;
+        PlayerPrefs.SetInt("SkillCoinsCollected", coins);
+        PlayerPrefs.Save();
+        UIManager.instance.UpdateCoinsDisplay(coins);
     }
 }

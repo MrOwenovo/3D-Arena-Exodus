@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animator: {fileID: 0}
   BarHolderPrefab: {fileID: 8570250024845691142, guid: e73a457cc1f512d4e9f90f7b562394e2, type: 3}
-  BarPoint: {fileID: 281555272565682687, guid: 2d66a02869739d94da0cce4fe6701660, type: 3}
+  BarPoint: {fileID: 7549456326787558317, guid: f0e171d219332084ea8c94fb3111a9b9, type: 3}
   agent: {fileID: 0}
   healthBar: {fileID: 0}
   main_cam: {fileID: 0}
@@ -32,6 +32,24 @@ MonoBehaviour:
   GetHitAS: {fileID: 0}
   isDead: 0
   deadTimer: 0
+  skillPrefabs: []
+  maxRadius: 5
+  expandRate: 1
+--- !u!114 &6496159498448490811
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8949563464759577997}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a2fdf2a53c446f9b44cf5a7a61e4b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillCoinPrefab: {fileID: 4188497090024008533, guid: 5686a1e690622cb4b82406b94eb42e33, type: 3}
+  bossTransform: {fileID: 8945524601097086903}
+  spawnRadius: 15
 --- !u!1001 &7956644581206300337
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -93,5 +111,10 @@ PrefabInstance:
 --- !u!1 &8949563464759577997 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1321967683995540284, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
+  m_PrefabInstance: {fileID: 7956644581206300337}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &8945524601097086903 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1319358074116272390, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
   m_PrefabInstance: {fileID: 7956644581206300337}
   m_PrefabAsset: {fileID: 0}

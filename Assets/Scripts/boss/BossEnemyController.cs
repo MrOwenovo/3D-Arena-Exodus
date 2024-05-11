@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,15 +6,29 @@ using UnityEngine.UI;
 
 public class BossEnemyController : EnemyController 
 {
-    
+    public GameObject[] skillPrefabs; 
+    private LineRenderer lineRenderer;
+    public float maxRadius = 5f;
+    public float expandRate = 1f;
+    private float radius = 0.0f;
+    private bool isAttacking = false;
 
 
     // Start is called before the first frame update
     void Start()
     {
+        // agent.enabled = false; // 禁用NavMeshAgent以固定Boss位置
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.startWidth = 0.05f;
+        lineRenderer.endWidth = 0.05f;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default")) { color = Color.red };
+        lineRenderer.positionCount = 0;
+
+        StartCoroutine(SkillDeploymentRoutine());
+        
         base.main_cam = Camera.main.transform;
-        healthBar = Instantiate(BarHolderPrefab, UIManager.instance.enemyBarsUI.transform);
-        animator = GetComponent<Animator>();
+        base.healthBar = Instantiate(BarHolderPrefab, UIManager.instance.enemyBarsUI.transform);
+        base.animator = GetComponent<Animator>();
         GetHitAS = GetComponent<AudioSource>();
     }
 
@@ -25,10 +38,20 @@ public class BossEnemyController : EnemyController
 
         if(GameManager.instance.curStatus == Status.Game && !isDead)
         {
-            if(healthBar != null)
+            
+            if (!isDead)
             {
-                healthBar.transform.position = BarPoint.position;
-                healthBar.transform.LookAt(main_cam.position);
+                LookAtPlayer();
+                if (isAttacking)
+                {
+                    ExpandCircle();
+                }
+            }
+            
+            if(base.healthBar != null)
+            {
+                base.healthBar.transform.position = BarPoint.position;
+                base.healthBar.transform.LookAt(main_cam.position);
 
             }
             if(!PlayerController.instance.isAttacking)
@@ -39,14 +62,7 @@ public class BossEnemyController : EnemyController
                 gameObject.AddComponent<NavMeshAgent>();
             }
             agent = gameObject.GetComponent<NavMeshAgent>();
-            // if (agent.isOnNavMesh)
-            // {
-            //     agent.SetDestination(GameManager.instance.Player.transform.position);
-            // }
-            // else
-            // {
-            //     agent.Warp(transform.position);
-            // }
+           
 
             // speed up
             timer += Time.deltaTime;
@@ -57,7 +73,7 @@ public class BossEnemyController : EnemyController
             }
 
             CheckDeath();
-            healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount = enemyData.CurHealth / enemyData.MaxHealth;
+            base.healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount = enemyData.CurHealth / enemyData.MaxHealth;
             enemyData.Location = transform.position;
 
         }else if (isDead)
@@ -66,13 +82,84 @@ public class BossEnemyController : EnemyController
             if(deadTimer > 1)
             {
                 Destroy(gameObject);
-                Destroy(healthBar);
+                Destroy(base.healthBar);
 
             }
         }
 
     }
+    void LookAtPlayer()
+    {
+        Vector3 direction = PlayerController.instance.transform.position - transform.position;
+        direction.y = 0; // Keep the boss level
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, Time.deltaTime * 5f);
+    }
+    IEnumerator SkillDeploymentRoutine()
+    {
+        // yield return new WaitForSeconds(1);
+        // DeploySkill(0);
+        // yield return new WaitForSeconds(1);
+        // DeploySkill(1);
+        // yield return new WaitForSeconds(1);
+        // DeploySkill(2);
+        // yield return new WaitForSeconds(1);
+        // DeploySkill(3);
+        ;
 
+        while (!isDead)
+        {
+            yield return new WaitForSeconds(Random.Range(1, 5));
+            DeploySkill(Random.Range(0, 4));
+        }
+    }
+    void DeploySkill(int skillIndex)
+    {
+        // Assuming DeployEnemies() method creates enemies around the boss based on skill index
+        Vector3 spawnPosition = transform.position + new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
+        EnemyGenerator.instance.DeployEnemies(skillIndex, spawnPosition);
+    }
+
+    void ExpandCircle()
+    {
+        radius += Time.deltaTime * expandRate;
+        if (radius > maxRadius)
+        {
+            isAttacking = false;
+            lineRenderer.positionCount = 0;
+            return;
+        }
+
+        DrawCircle(radius);
+        CheckPlayerCollision(radius);
+    }
+
+    void DrawCircle(float radius)
+    {
+        Debug.Log("画圈");
+        int segments = 360;
+        lineRenderer.positionCount = segments + 1;
+        Vector3[] points = new Vector3[segments + 1];
+
+        for (int i = 0; i <= segments; i++)
+        {
+            float angle = Mathf.Deg2Rad * i;
+            points[i] = new Vector3(Mathf.Sin(angle) * radius, 0, Mathf.Cos(angle) * radius) + transform.position;
+        }
+
+        lineRenderer.SetPositions(points);
+    }
+    void CheckPlayerCollision(float currentRadius)
+    {
+        if (Vector3.Distance(PlayerController.instance.transform.position, transform.position) <= currentRadius)
+        {
+            PlayerController.instance.GetHurt(enemyData.Attack); // Apply damage based on boss attack
+            isAttacking = false;  // Stop attack after hitting the player
+            lineRenderer.positionCount = 0;  // Clear the circle
+        }
+    }
+    
+    
     private void CheckDeath()
     {
         if (enemyData.CurHealth <= 0)

@@ -13,22 +13,22 @@ public class PlayerController : PlayerMovement
     public float invincibleTime;
     float check_iv_time = 0;
     public float attackCD;
-    float check_att_time =0;
+    float check_att_time = 0;
     bool canAttack = true;
 
     //Player status
     bool isRun;
     public bool isCritical;
     public bool isAttacking = false;
-    
+
     public bool isInvincible = false;
-    
-    
-    public GameObject indicatorPrefab;  
+
+
+    public GameObject indicatorPrefab;
     private GameObject currentIndicator;
     private Vector3 targetPosition;
     private bool movingToTarget = false;
-    
+
     public PlayerData playerData;
 
 
@@ -36,6 +36,7 @@ public class PlayerController : PlayerMovement
 
     public AudioSource WeaponAS;
     public ParticleSystem ps;
+
     private void Awake()
     {
         instance = this;
@@ -43,25 +44,24 @@ public class PlayerController : PlayerMovement
 
     IEnumerator SPCheck()
     {
-        while (true&& GameManager.instance.curStatus == Status.Game)
+        while (true && GameManager.instance.curStatus == Status.Game)
         {
             if (isRun)
             {
-                if(curSP > 0)
+                if (curSP > 0)
                 {
                     curSP -= 10;
                 }
             }
             else
             {
-                if(curSP <100) {
+                if (curSP < 100)
+                {
                     curSP += 10;
-
-
                 }
             }
-            yield return new WaitForSeconds(1);
 
+            yield return new WaitForSeconds(1);
         }
     }
 
@@ -72,9 +72,10 @@ public class PlayerController : PlayerMovement
         {
             SetData(DefaultPlayerData());
         }
+
         animator = GetComponent<Animator>();
-        
-        
+
+
         StartCoroutine(SPCheck());
     }
 
@@ -92,7 +93,7 @@ public class PlayerController : PlayerMovement
         pData.MoveSpeed = 5;
 
         pData.CurExp = 0;
-        pData.MaxExp = GameManager.instance.experienceToNextLevel[pData.Level -1];
+        pData.MaxExp = GameManager.instance.experienceToNextLevel[pData.Level - 1];
         return pData;
     }
 
@@ -104,9 +105,9 @@ public class PlayerController : PlayerMovement
             bool isMove = MovePlayer(GroundLayer);
             animator.SetBool("Walk", isMove);
 
-            if (Input.GetKey(KeyCode.LeftShift) )
+            if (Input.GetKey(KeyCode.LeftShift))
             {
-                if(curSP > 0)
+                if (curSP > 0)
                 {
                     moveSpeed = 8;
                     isRun = true;
@@ -118,9 +119,8 @@ public class PlayerController : PlayerMovement
                     isRun = false;
                     animator.SetBool("Run", isRun);
                 }
-                
             }
-            
+
 
             if (Input.GetKeyUp(KeyCode.LeftShift))
             {
@@ -129,48 +129,47 @@ public class PlayerController : PlayerMovement
                 animator.SetBool("Run", isRun);
             }
 
-            if (Input.GetMouseButtonDown(1))  
+            if (Input.GetMouseButtonDown(1))
             {
                 Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 RaycastHit hit;
                 if (Physics.Raycast(ray, out hit, 100f, GroundLayer))
                 {
-                    targetPosition = hit.point+new Vector3(0,0.3f,0);
-                    movingToTarget = true;  
+                    targetPosition = hit.point + new Vector3(0, 0.3f, 0);
+                    movingToTarget = true;
                     ShowIndicator(targetPosition);
                 }
             }
 
             if (movingToTarget)
             {
-                MoveToLocation();  
+                MoveToLocation();
             }
-            
-           
-          
+
 
             if (Input.GetMouseButtonDown(0) && canAttack)
             {
-                canAttack= false;
+                canAttack = false;
                 int att_value = Random.Range(0, 100);
                 WeaponAS.Play();
                 if (att_value <= playerData.CriticalRate)
                 {
                     isCritical = true;
-
                 }
                 else
                 {
                     isCritical = false;
-
                 }
+
                 animator.SetBool("Critical", isCritical);
                 animator.SetTrigger("Attack");
             }
-            if(isInvincible)
+
+            if (isInvincible)
             {
                 InvincibleTime();
             }
+
             if (!canAttack)
             {
                 AttackCoolTime();
@@ -181,19 +180,20 @@ public class PlayerController : PlayerMovement
             playerData.Location = transform.position;
         }
     }
+
     void MoveToLocation()
     {
         if (Vector3.Distance(transform.position, targetPosition) > 0.1f)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-            transform.LookAt(new Vector3(targetPosition.x, transform.position.y, targetPosition.z));  
+            transform.LookAt(new Vector3(targetPosition.x, transform.position.y, targetPosition.z));
         }
         else
         {
-            movingToTarget = false;  
+            movingToTarget = false;
             if (currentIndicator != null)
             {
-                Destroy(currentIndicator);  
+                Destroy(currentIndicator);
             }
         }
     }
@@ -202,10 +202,21 @@ public class PlayerController : PlayerMovement
     {
         if (currentIndicator != null)
         {
-            Destroy(currentIndicator);  
+            Destroy(currentIndicator);
         }
+
         currentIndicator = Instantiate(indicatorPrefab, position, Quaternion.identity);
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag("SkillCoin"))
+        {
+            Debug.Log("Collected a skill coin.");
+            SkillCoinManager.instance.CoinCollected();
+        }
+    }
+
 
     private void AttackCoolTime()
     {
@@ -216,6 +227,7 @@ public class PlayerController : PlayerMovement
             check_att_time = 0;
         }
     }
+
     private void InvincibleTime()
     {
         check_iv_time += Time.deltaTime;
@@ -228,9 +240,8 @@ public class PlayerController : PlayerMovement
 
     private void CheckLevelUp()
     {
-        if(playerData.CurExp >= playerData.MaxExp)
+        if (playerData.CurExp >= playerData.MaxExp)
         {
-           
             ps.Play();
             playerData.CurExp = 0;
             playerData.Level += 1;
@@ -245,7 +256,7 @@ public class PlayerController : PlayerMovement
 
     private void CheckDeath()
     {
-        if(playerData.CurHealth <= 0)
+        if (playerData.CurHealth <= 0)
         {
             animator.SetTrigger("Die");
             UIManager.instance.WINtext.enabled = false;

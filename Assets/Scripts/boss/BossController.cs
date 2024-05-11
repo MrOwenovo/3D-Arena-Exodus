@@ -24,7 +24,6 @@ public class BossController : MonoBehaviour
         {
             DeployBoss();
             isBossGenerated = true;
-            StartCoroutine(SkillDeploymentRoutine());
         }
         else if (GameManager.instance.curStatus != Status.Game)
         {
@@ -67,23 +66,5 @@ public class BossController : MonoBehaviour
     }
 
 
-    IEnumerator SkillDeploymentRoutine()
-    {
-        yield return new WaitForSeconds(1);
-        EnemyGenerator.instance.DeployEnemies(0, bossTransform.position);
-        yield return new WaitForSeconds(1);
-        EnemyGenerator.instance.DeployEnemies(1, bossTransform.position);
-        yield return new WaitForSeconds(1);
-        EnemyGenerator.instance.DeployEnemies(2, bossTransform.position);
-        yield return new WaitForSeconds(1);
-        EnemyGenerator.instance.DeployEnemies(3, bossTransform.position);
-
-        // Continue deploying enemies randomly near the boss
-        while (true)
-        {
-            yield return new WaitForSeconds(Random.Range(1, 5));
-            int randomSkill = Random.Range(0, 4);
-            EnemyGenerator.instance.DeployEnemies(randomSkill, bossTransform.position);
-        }
-    }
+   
 }
