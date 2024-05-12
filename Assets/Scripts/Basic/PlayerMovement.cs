@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -19,9 +21,14 @@ public class PlayerMovement : MonoBehaviour
     // This is the player's height
     public static float playerHeight = 1.0f;
 
-   
     
     public bool ifOnGround = true;
+
+
+    private void Start()
+    {
+        Init();
+    }
 
     // Fire five ray to determine if the player is standing on the ground or in the air.
     public bool IfGrounded() {
@@ -47,35 +54,10 @@ public class PlayerMovement : MonoBehaviour
             Vector3 mouse_world_point = hit.point;
             mouse_world_point.y = transform.position.y;
             transform.LookAt(mouse_world_point);
-
         }
-
-
         //-----------------------------
         ifOnGround = IfGrounded();
-        // This is the movement part
-        //if (Input.GetKey(KeyCode.W)) {
-        //    this.transform.position = new Vector3(this.transform.position.x + moveSpeed * Time.deltaTime, this.transform.position.y, this.transform.position.z);
-        //    //this.transform.rotation = Quaternion.Euler(0, 0, 0);
-        //    move = true;
-        //}
-        //if (Input.GetKey(KeyCode.S)) {
-        //    this.transform.position = new Vector3(this.transform.position.x - moveSpeed * Time.deltaTime, this.transform.position.y, this.transform.position.z);
-        //    //this.transform.rotation = Quaternion.Euler(0, 180, 0);
-        //    move = true;
-        //}
-        //if (Input.GetKey(KeyCode.A)) {
-        //    this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z + moveSpeed * Time.deltaTime);
-        //    //this.transform.rotation = Quaternion.Euler(0, 270, 0);
-        //    move = true;
-        //}
-        //if (Input.GetKey(KeyCode.D)) {
-        //    this.transform.position = new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z - moveSpeed * Time.deltaTime);
-        //    //this.transform.rotation = Quaternion.Euler(0, 90, 0);
-        //    move = true;
-        //}
-
-        move = MoveAxis();
+        // move = MoveAxis();
         // This is the jump part
         if (Input.GetKeyDown(KeyCode.Space) && (ifOnGround || curJumpTimes > 0)) {
             if (ifOnGround)
@@ -114,21 +96,12 @@ public class PlayerMovement : MonoBehaviour
     // This is the initialization part
     void Init() {
         curJumpTimes = maxJumpTimes;
-        this.GetComponent<Rigidbody>().AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
+        // this.GetComponent<Rigidbody>().AddForce(Vector3.up * jumpSpeed, ForceMode.Impulse);
        
     }
 
 
-    void Start()
-    {
-        Init();
-    }
-
-
-    void Update()
-    {
-       
-    }
+  
     
    
 }

@@ -20,8 +20,9 @@ public class EnemyGenerator : MonoBehaviour
    
     public void DeployEnemies(int skillLevel, Vector3 bossPosition)
     {
-        // Adjusted to spawn enemies around the boss, not randomly across the map
-        Vector3 spawnPoint = bossPosition + new Vector3(Random.Range(-5, 6), 7, Random.Range(-5, 6));
+        // Calculate the start and end points of the parabola
+        Vector3 startPoint = bossPosition + new Vector3(0, 7, 0); // Start point above the boss
+        Vector3 endPoint = bossPosition + new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6)); // End point around the boss
 
         GameObject enemyPrefab;
         EnemyData enemyData;
@@ -29,88 +30,51 @@ public class EnemyGenerator : MonoBehaviour
         switch (skillLevel)
         {
             case 0:
-                DefaultSlimeData(spawnPoint);
-                // enemyPrefab = SlimePrefab;
-                // enemyData = new EnemyData { MaxHealth = 100, Attack = 10, Exp = 20 };
+                enemyData = DefaultSlimeData(startPoint, endPoint);
                 break;
             case 1:
-                DefaultTurtleData(spawnPoint);
-
-                // enemyPrefab = TurtlePrefab;
-                // enemyData = new EnemyData { MaxHealth = 160, Attack = 20, Exp = 35 };
+                enemyData = DefaultTurtleData(startPoint, endPoint);
                 break;
             case 2:
-                DefaultBoxData(spawnPoint);
-
-                // enemyPrefab = BoxPrefab;
-                // enemyData = new EnemyData { MaxHealth = 200, Attack = 20, Exp = 60 };
+                enemyData = DefaultBoxData(startPoint, endPoint);
                 break;
             case 3:
-                DefaultETData(spawnPoint);
-
-                // enemyPrefab = ETPrefab;
-                // enemyData = new EnemyData { MaxHealth = 300, Attack = 20, Exp = 100 };
+                enemyData = DefaultETData(startPoint, endPoint);
                 break;
             default:
                 return; // Handle unexpected skill level
         }
 
-       
+        // Instantiate enemies and set data
     }
 
    
-    public void CreateEnemy()
+
+    EnemyData DefaultSlimeData(Vector3 startPoint, Vector3 endPoint)
     {
-        if(GameManager.instance.curStatus == Status.Game)
-        {
-            while (true)
-            {
-                int generatX = Random.Range(0 + GameManager.instance.seaWidth, GameManager.instance.mapSize[0] - GameManager.instance.seaWidth);
-                int generatZ = Random.Range(0 + GameManager.instance.seaWidth, GameManager.instance.mapSize[2] - GameManager.instance.seaWidth);
-                Vector3 check_Point = new Vector3(generatX, 7, generatZ);
-                RaycastHit hit;
-                if (Physics.Raycast(check_Point, Vector3.down, out hit, 9))
-                {
-                    if (hit.collider.tag == "Ground")
-                    {
-                        if(GameManager.instance.Level == 1)
-                        {
-                            DefaultSlimeData(check_Point);
-                            
-                        }else if(GameManager.instance.Level == 2)
-                        {
-                            DefaultTurtleData(check_Point);
-                        }
-                        else if (GameManager.instance.Level == 3)
-                        {
-                            DefaultBoxData(check_Point);
-                        }
-                        else if (GameManager.instance.Level == 4)
-                        {
-                            DefaultETData(check_Point);
-                        }
-                        else
-                        {
-                            break;
-                        }
-
-                        break;
-
-                    }
-                }
-            }
-        }
-
-
-    }
-
-    EnemyData DefaultSlimeData(Vector3 check_point)
-    {
-        GameObject temp = Instantiate(SlimePrefab);
-        temp.transform.position = check_point - new Vector3(0, 3, 0);
+        // Instantiate SlimePrefab at the startPoint
+        GameObject temp = Instantiate(SlimePrefab, startPoint, Quaternion.identity);
         temp.transform.parent = EnemyParent.transform;
-        
 
+        // Add Rigidbody component to the enemy
+        Rigidbody rb = temp.AddComponent<Rigidbody>();
+        rb.useGravity = true; // Enable gravity for the enemy to follow a parabolic path
+
+        // Calculate velocity vector for the parabolic trajectory
+        Vector3 direction = endPoint - startPoint;
+        float height = Mathf.Abs(direction.y); // Height of the parabola
+        direction.y = 0; // Ignore vertical direction for horizontal velocity
+        float distance = direction.magnitude; // Distance between start and end points
+        float horizontalSpeed = distance / 2; // Adjust speed as needed
+        float verticalSpeed = Mathf.Sqrt(2 * Physics.gravity.magnitude * height); // Calculate vertical velocity based on gravity and height
+
+        Vector3 horizontalVelocity = direction.normalized * horizontalSpeed; // Horizontal velocity
+        Vector3 verticalVelocity = Vector3.up * verticalSpeed; // Vertical velocity
+
+        // Set initial velocity for the enemy Rigidbody
+        rb.velocity = horizontalVelocity + verticalVelocity;
+
+        // Set enemy data and return
         EnemyData slimeData = new EnemyData();
         slimeData.MaxHealth = 100;
         slimeData.CurHealth = slimeData.MaxHealth;
@@ -120,50 +84,97 @@ public class EnemyGenerator : MonoBehaviour
         temp.GetComponent<EnemyController>().enemyData = slimeData;
         return slimeData;
     }
+    EnemyData DefaultTurtleData(Vector3 startPoint, Vector3 endPoint)
+{
+    GameObject temp = Instantiate(TurtlePrefab, startPoint, Quaternion.identity);
+    temp.transform.parent = EnemyParent.transform;
 
-    EnemyData DefaultTurtleData(Vector3 check_point)
-    {
-        GameObject temp = Instantiate(TurtlePrefab);
-        temp.transform.position = check_point - new Vector3(0, 3, 0);
-        temp.transform.parent = EnemyParent.transform;
+    Rigidbody rb = temp.AddComponent<Rigidbody>();
+    rb.useGravity = true;
 
-        EnemyData turtleData = new EnemyData();
-        turtleData.MaxHealth = 160;
-        turtleData.CurHealth = turtleData.MaxHealth;
-        turtleData.Attack = 20;
-        turtleData.Exp = 35;
+    Vector3 direction = endPoint - startPoint;
+    float height = Mathf.Abs(direction.y);
+    direction.y = 0;
+    float distance = direction.magnitude;
+    float horizontalSpeed = distance / 2;
+    float verticalSpeed = Mathf.Sqrt(2 * Physics.gravity.magnitude * height);
 
-        temp.GetComponent<EnemyController>().enemyData = turtleData;
-        return turtleData;
-    }
-    EnemyData DefaultBoxData(Vector3 check_point)
-    {
-        GameObject temp = Instantiate(BoxPrefab);
-        temp.transform.position = check_point - new Vector3(0, 3, 0);
-        temp.transform.parent = EnemyParent.transform;
+    Vector3 horizontalVelocity = direction.normalized * horizontalSpeed;
+    Vector3 verticalVelocity = Vector3.up * verticalSpeed;
 
-        EnemyData turtleData = new EnemyData();
-        turtleData.MaxHealth = 200;
-        turtleData.CurHealth = turtleData.MaxHealth;
-        turtleData.Attack = 20;
-        turtleData.Exp = 60;
+    rb.velocity = horizontalVelocity + verticalVelocity;
 
-        temp.GetComponent<EnemyController>().enemyData = turtleData;
-        return turtleData;
-    }
-    EnemyData DefaultETData(Vector3 check_point)
-    {
-        GameObject temp = Instantiate(ETPrefab);
-        temp.transform.position = check_point - new Vector3(0, 3, 0);
-        temp.transform.parent = EnemyParent.transform;
+    EnemyData turtleData = new EnemyData();
+    turtleData.MaxHealth = 160;
+    turtleData.CurHealth = turtleData.MaxHealth;
+    turtleData.Attack = 20;
+    turtleData.Exp = 35;
 
-        EnemyData turtleData = new EnemyData();
-        turtleData.MaxHealth = 300;
-        turtleData.CurHealth = turtleData.MaxHealth;
-        turtleData.Attack = 20;
-        turtleData.Exp = 100;
+    temp.GetComponent<EnemyController>().enemyData = turtleData;
+    return turtleData;
+}
 
-        temp.GetComponent<EnemyController>().enemyData = turtleData;
-        return turtleData;
-    }
+EnemyData DefaultBoxData(Vector3 startPoint, Vector3 endPoint)
+{
+    GameObject temp = Instantiate(BoxPrefab, startPoint, Quaternion.identity);
+    temp.transform.parent = EnemyParent.transform;
+
+    Rigidbody rb = temp.AddComponent<Rigidbody>();
+    rb.useGravity = true;
+
+    Vector3 direction = endPoint - startPoint;
+    float height = Mathf.Abs(direction.y);
+    direction.y = 0;
+    float distance = direction.magnitude;
+    float horizontalSpeed = distance / 2;
+    float verticalSpeed = Mathf.Sqrt(2 * Physics.gravity.magnitude * height);
+
+    Vector3 horizontalVelocity = direction.normalized * horizontalSpeed;
+    Vector3 verticalVelocity = Vector3.up * verticalSpeed;
+
+    rb.velocity = horizontalVelocity + verticalVelocity;
+
+    EnemyData boxData = new EnemyData();
+    boxData.MaxHealth = 200;
+    boxData.CurHealth = boxData.MaxHealth;
+    boxData.Attack = 20;
+    boxData.Exp = 60;
+
+    temp.GetComponent<EnemyController>().enemyData = boxData;
+    return boxData;
+}
+
+EnemyData DefaultETData(Vector3 startPoint, Vector3 endPoint)
+{
+    GameObject temp = Instantiate(ETPrefab, startPoint, Quaternion.identity);
+    temp.transform.parent = EnemyParent.transform;
+
+    Rigidbody rb = temp.AddComponent<Rigidbody>();
+    rb.useGravity = true;
+
+    Vector3 direction = endPoint - startPoint;
+    float height = Mathf.Abs(direction.y);
+    direction.y = 0;
+    float distance = direction.magnitude;
+    float horizontalSpeed = distance / 2;
+    float verticalSpeed = Mathf.Sqrt(2 * Physics.gravity.magnitude * height);
+
+    Vector3 horizontalVelocity = direction.normalized * horizontalSpeed;
+    Vector3 verticalVelocity = Vector3.up * verticalSpeed;
+
+    rb.velocity = horizontalVelocity + verticalVelocity;
+
+    EnemyData etData = new EnemyData();
+    etData.MaxHealth = 300;
+    etData.CurHealth = etData.MaxHealth;
+    etData.Attack = 20;
+    etData.Exp = 100;
+
+    temp.GetComponent<EnemyController>().enemyData = etData;
+    return etData;
+}
+
+  
+
+ 
 }

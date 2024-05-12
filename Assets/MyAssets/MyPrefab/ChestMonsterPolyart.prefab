@@ -894,6 +894,8 @@ MonoBehaviour:
   BarHolderPrefab: {fileID: 8570250024845691142, guid: e73a457cc1f512d4e9f90f7b562394e2, type: 3}
   BarPoint: {fileID: 7549456326787558317}
   agent: {fileID: 0}
+  healthBar: {fileID: 0}
+  main_cam: {fileID: 0}
   enemyData:
     current_position:
     - 0
@@ -903,7 +905,11 @@ MonoBehaviour:
     max_health: 0
     attack: 0
     exp: 0
+  isGetHit: 0
+  timer: 0
   GetHitAS: {fileID: 0}
+  isDead: 0
+  deadTimer: 0
 --- !u!82 &1309093050329359909
 AudioSource:
   m_ObjectHideFlags: 0

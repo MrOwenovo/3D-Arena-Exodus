@@ -174,7 +174,7 @@ public class GameManager : MonoBehaviour
         while(true && GameManager.instance.curStatus == Status.Game)
         {
             yield return new WaitForSeconds(wati_time);
-            EnemyGenerator.instance.CreateEnemy();
+            // EnemyGenerator.instance.CreateEnemy();
         }
     }
     void Start()
@@ -247,12 +247,68 @@ public class GameManager : MonoBehaviour
         
         StartCoroutine(BakeNavMesh());
         GeneratePlayer();
-
+        ToggleSkillStoreVisibility();
+        // SkillUI.instance.storePanel.SetActive(true);
 
         // IEnumerator enu = GeneratEnemies(wait_time);
         // StartCoroutine(enu);
         BossController.instance.isBossGenerated = false;
     }
+    public void ToggleSkillStoreVisibility()
+    {
+        // 首先，设定 storePanel 下除指定 containers 外的所有子对象为不活跃
+        foreach (Transform child in SkillUI.instance.storePanel.transform)
+        {
+            // 仅当 child 不是 skillContainers 数组中的一个元素时，才设其为不活跃
+            bool shouldStayActive = false;
+
+            foreach (GameObject container in SkillUI.instance.skillContainers)
+            {
+                if (child.gameObject == container)
+                {
+                    shouldStayActive = true;
+                    break;
+                }
+            }
+            if (!shouldStayActive)
+            {
+                SetActiveRecursive(child.gameObject, false);
+            }
+            else
+            {
+                // 对于 container 中的每个 skillPanel(Clone)，递归地设置其子对象的活跃状态
+                foreach (Transform subChild in child)
+                {
+                    if (subChild.name == "skillPanel(Clone)")
+                    {
+                        SetActiveRecursive(subChild.gameObject, true); // 激活 skillPanel(Clone) 及其所有子对象
+                    }
+                }
+            }
+        }
+
+        // 确保 containerContainer 也保持正确的活跃状态
+        SkillUI.instance.storePanel.SetActive(true);
+        SkillUI.instance.containerContainer.SetActive(true);
+        foreach (GameObject container in SkillUI.instance.skillContainers)
+        {
+            container.SetActive(true); // 确保这些特定容器始终是活跃的
+        }
+    }
+
+// 递归设置 GameObject 及其所有子对象的活跃状态，除非对象名为 "Image"
+    void SetActiveRecursive(GameObject obj, bool active)
+    {
+        if (obj.name != "Image")
+        {
+            obj.SetActive(active);
+            foreach (Transform child in obj.transform)
+            {
+                SetActiveRecursive(child.gameObject, active);
+            }
+        }
+    }
+
 
     public void StartFromLoad()
     {
@@ -310,8 +366,8 @@ public class GameManager : MonoBehaviour
 
         uiData = SaveManager.instance.LoadUIData();
 
-        IEnumerator enu = GeneratEnemies(wait_time);
-        StartCoroutine(enu);
+        // IEnumerator enu = GeneratEnemies(wait_time);
+        // StartCoroutine(enu);
 
 
     }
@@ -376,6 +432,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(enemyBars.GetChild(i).gameObject);
         }
+        SkillUI.instance.SetActiveRecursively(SkillUI.instance.storePanel, false);
     }
 
     public void ReStart()
