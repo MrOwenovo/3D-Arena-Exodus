@@ -1468,10 +1468,11 @@ GameObject:
   - component: {fileID: 1715825041396226202}
   - component: {fileID: 1826081424315503798}
   - component: {fileID: 741735508564002264}
+  - component: {fileID: 4448579059374607027}
   - component: {fileID: 4965735437914233949}
   m_Layer: 0
   m_Name: BeholderPolyart
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1579,6 +1580,41 @@ MonoBehaviour:
   GetHitAS: {fileID: 0}
   isDead: 0
   deadTimer: 0
+--- !u!114 &4448579059374607027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4796426612172929117}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 273b60ddede1437785902a94486584f0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animator: {fileID: 0}
+  BarHolderPrefab: {fileID: 8570250024845691142, guid: e73a457cc1f512d4e9f90f7b562394e2, type: 3}
+  BarPoint: {fileID: 167186921537854929, guid: 7f3ed6d4dc8fd06469c27ab35d289955, type: 3}
+  agent: {fileID: 0}
+  healthBar: {fileID: 0}
+  main_cam: {fileID: 0}
+  enemyData:
+    current_position:
+    - 0
+    - 0
+    - 0
+    current_health: 0
+    max_health: 0
+    attack: 0
+    exp: 0
+  isGetHit: 0
+  timer: 0
+  GetHitAS: {fileID: 0}
+  isDead: 0
+  deadTimer: 0
+  skillPrefabs: []
+  maxRadius: 5
+  expandRate: 1
 --- !u!82 &4965735437914233949
 AudioSource:
   m_ObjectHideFlags: 0

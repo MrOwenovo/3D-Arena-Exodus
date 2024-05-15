@@ -8,7 +8,7 @@ public class SkillCoinManager : MonoBehaviour
     public GameObject skillCoinPrefab;  // Prefab for the Skill Coin
     public Transform bossTransform;     // Reference to the boss's transform
     public float spawnRadius = 15.0f;   // Radius around the boss within which coins can appear
-    private GameObject currentSkillCoin = null;
+    public GameObject currentSkillCoin = null;
 
     private void Awake()
     {
@@ -36,13 +36,15 @@ public class SkillCoinManager : MonoBehaviour
 
     void SpawnSkillCoin()
     {
-        Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
-        randomDirection.y = 0; // 确保硬币在地面高度生成
+        if ((GameManager.instance.curStatus == Status.Game))
+        {
+            Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
+            randomDirection.y = 0; // 确保硬币在地面高度生成
 
-        Vector3 spawnLocation = bossTransform.position + randomDirection + new Vector3(0, 0.5f, 0);
-        currentSkillCoin = Instantiate(skillCoinPrefab, spawnLocation, Quaternion.identity);
-
-        
+            Vector3 spawnLocation = bossTransform.position + randomDirection + new Vector3(0, 0.5f, 0);
+            currentSkillCoin = Instantiate(skillCoinPrefab, spawnLocation, Quaternion.identity);
+ 
+        }
     }
 
 

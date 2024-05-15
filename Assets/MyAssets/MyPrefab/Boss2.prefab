@@ -1,62 +1,12 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &2766923836177514239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8949563464759577997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 273b60ddede1437785902a94486584f0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  animator: {fileID: 0}
-  BarHolderPrefab: {fileID: 8570250024845691142, guid: e73a457cc1f512d4e9f90f7b562394e2, type: 3}
-  BarPoint: {fileID: 7549456326787558317, guid: f0e171d219332084ea8c94fb3111a9b9, type: 3}
-  agent: {fileID: 0}
-  healthBar: {fileID: 0}
-  main_cam: {fileID: 0}
-  enemyData:
-    current_position:
-    - 0
-    - 0
-    - 0
-    current_health: 0
-    max_health: 0
-    attack: 0
-    exp: 0
-  isGetHit: 0
-  timer: 0
-  GetHitAS: {fileID: 0}
-  isDead: 0
-  deadTimer: 0
-  skillPrefabs: []
-  maxRadius: 5
-  expandRate: 1
---- !u!114 &6496159498448490811
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8949563464759577997}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1a2fdf2a53c446f9b44cf5a7a61e4b3a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  skillCoinPrefab: {fileID: 4188497090024008533, guid: 5686a1e690622cb4b82406b94eb42e33, type: 3}
-  bossTransform: {fileID: 8945524601097086903}
-  spawnRadius: 15
---- !u!54 &-9109078649533888103
+--- !u!54 &7913911138123798245
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8949563464759577997}
+  m_GameObject: {fileID: 522132669902267655}
   serializedVersion: 2
   m_Mass: 1
   m_Drag: 0
@@ -66,7 +16,23 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!1001 &7956644581206300337
+--- !u!114 &3919028738684948039
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 522132669902267655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a2fdf2a53c446f9b44cf5a7a61e4b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillCoinPrefab: {fileID: 4188497090024008533, guid: 5686a1e690622cb4b82406b94eb42e33, type: 3}
+  bossTransform: {fileID: 515982470643011389}
+  spawnRadius: 15
+  currentSkillCoin: {fileID: 0}
+--- !u!1001 &1542041415674969659
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -121,16 +87,27 @@ PrefabInstance:
       propertyPath: m_Name
       value: Boss2
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 1323519104772141059, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
+    - target: {fileID: 1321967683995540284, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5348471232651103123, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
+      propertyPath: bleedPrefab
+      value: 
+      objectReference: {fileID: 3021877135130851492, guid: 9f340188660d88a49983d91a4ae19c0a, type: 3}
+    - target: {fileID: 5348471232651103123, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
+      propertyPath: staticPrefab
+      value: 
+      objectReference: {fileID: 6950423379102812, guid: 6fa139b8f6ebef948948f21b825b6806, type: 3}
+    m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
---- !u!1 &8949563464759577997 stripped
+--- !u!1 &522132669902267655 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1321967683995540284, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
-  m_PrefabInstance: {fileID: 7956644581206300337}
+  m_PrefabInstance: {fileID: 1542041415674969659}
   m_PrefabAsset: {fileID: 0}
---- !u!4 &8945524601097086903 stripped
+--- !u!4 &515982470643011389 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1319358074116272390, guid: 9c7e45771abed104d8d56b09697a1bf6, type: 3}
-  m_PrefabInstance: {fileID: 7956644581206300337}
+  m_PrefabInstance: {fileID: 1542041415674969659}
   m_PrefabAsset: {fileID: 0}

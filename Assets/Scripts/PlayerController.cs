@@ -14,8 +14,8 @@ public class PlayerController : PlayerMovement
     public float invincibleTime;
     float check_iv_time = 0;
     public float attackCD;
-    float check_att_time = 0;
-    bool canAttack = true;
+    private Dictionary<string, float> skillCooldowns = new Dictionary<string, float>();
+    public bool canAttack = true;
 
     //Player status
     bool isRun;
@@ -26,6 +26,11 @@ public class PlayerController : PlayerMovement
 
 
     public GameObject indicatorPrefab;
+    public GameObject laserPrefab;
+    public GameObject bleedPrefab;
+    public GameObject bombPrefab;
+    public GameObject swordPrefab;
+
     private GameObject currentIndicator;
     private Vector3 targetPosition;
     private bool movingToTarget = false;
@@ -39,10 +44,40 @@ public class PlayerController : PlayerMovement
     public ParticleSystem ps;
 
     public Skill currentSkill;
-    private int selectedSkillIndex = 0;
-    private List<Skill> equippedSkills = new List<Skill>();
+    public int selectedSkillIndex = 0;
+    public List<Skill> equippedSkills = new List<Skill>();
+    public float chargeTime = 2f;
+    private float currentChargeTime = 0f;
 
+    public Dictionary<string, bool> skillCanAttack = new Dictionary<string, bool>(5);
+    public Dictionary<string, bool> skillCanAttackIsStart = new Dictionary<string, bool>(5);
     
+    // 设置技能冷却时间
+    public void SetSkillCooldown(string skillName, float cooldownTime)
+    {
+        if (skillCooldowns.ContainsKey(skillName))
+        {
+            skillCooldowns[skillName] = cooldownTime;
+        }
+        else
+        {
+            skillCooldowns.Add(skillName, cooldownTime);
+        }
+    }
+
+    // 获取技能冷却时间
+    public float GetSkillCooldown(string skillName)
+    {
+        if (skillCooldowns.ContainsKey(skillName))
+        {
+            return skillCooldowns[skillName];
+        }
+        else
+        {
+            return 0f; // 如果找不到技能名称，则返回默认值
+        }
+    }
+
     void Start()
     {
         if (GameManager.instance.isNewGame)
@@ -54,35 +89,43 @@ public class PlayerController : PlayerMovement
 
 
         StartCoroutine(SPCheck());
-        
-        StartCoroutine(DelayedUpdateEquippedSkills(1.0f)); 
+
+        StartCoroutine(DelayedUpdateEquippedSkills(1.0f));
         Debug.Log("初始化");
     }
+
     IEnumerator DelayedUpdateEquippedSkills(float delay)
     {
         yield return new WaitForSeconds(delay); // 等待指定的延迟时间
         UpdateEquippedSkills(); // 执行 UpdateEquippedSkills 方法
     }
- 
+
     void UpdateEquippedSkills()
     {
         equippedSkills.Clear();
         var flag = false;
-        var text = SkillUI.instance.skillContainers[0].transform.Find("skillPanel(Clone)/SkillImage/name").GetComponent<Text>();
-        while (!flag){
-            text =  SkillUI.instance.skillContainers[0].transform.Find("skillPanel(Clone)/SkillImage/name").GetComponent<Text>();
+        if (SkillUI.instance.skillContainers[0].transform.Find("skillPanel(Clone)/SkillImage/name")!=null)
+        {
+         
+        var text = SkillUI.instance.skillContainers[0].transform.Find("skillPanel(Clone)/SkillImage/name")
+            .GetComponent<Text>();
+        while (!flag)
+        {
+            text = SkillUI.instance.skillContainers[0].transform.Find("skillPanel(Clone)/SkillImage/name")
+                .GetComponent<Text>();
             if (text != null)
             {
                 flag = true;
             }
         }
+
         foreach (GameObject container in SkillUI.instance.skillContainers)
         {
             var find = container.transform.Find("skillPanel(Clone)/SkillImage/name");
-            if (find!=null)
+            if (find != null)
             {
                 var subtext = find.GetComponent<Text>();
-                Debug.Log("!!!2 "+subtext.text);
+                Debug.Log("!!!2 " + subtext.text);
                 if (subtext != null)
                 {
                     Skill skill = SkillManager.instance.GetSkillByName(subtext.text);
@@ -96,107 +139,144 @@ public class PlayerController : PlayerMovement
             {
                 return;
             }
-            
         }
+
         if (equippedSkills.Count > 0)
-            currentSkill = equippedSkills[0];  // 默认选中第一个技能
+            currentSkill = equippedSkills[0]; // 默认选中第一个技能
+           
+        }
     }
 
-    void HandleSkillSelection()
+    public void HandleSkillSelection()
     {
+        if (GameManager.instance.curStatus == Status.Game)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1) && equippedSkills.Count > 0)
+            {
+                setImageActive(0);
+                Debug.Log("设置为1");
+                currentSkill = equippedSkills[0];
+                selectedSkillIndex = 0;
+
+                Debug.Log(equippedSkills[0].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2) && equippedSkills.Count > 1)
+            {
+                setImageActive(1);
+
+                Debug.Log("设置为2");
+                currentSkill = equippedSkills[1];
+                selectedSkillIndex = 1;
+
+                Debug.Log(equippedSkills[1].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3) && equippedSkills.Count > 2)
+            {
+                setImageActive(2);
+
+                Debug.Log("设置为3");
+                currentSkill = equippedSkills[2];
+                selectedSkillIndex = 2;
+
+                Debug.Log(equippedSkills[2].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4) && equippedSkills.Count > 3)
+            {
+                setImageActive(3);
+
+                Debug.Log("设置为4");
+                currentSkill = equippedSkills[3];
+                selectedSkillIndex = 3;
+
+                Debug.Log(equippedSkills[3].name);
+            }
+        }else if (GameManager.instance.curStatus == Status.Training)
+        {
+            if (Input.GetKeyDown(KeyCode.Alpha1) )
+            {
+                setImageActive(0);
+                Debug.Log("设置为1");
+                currentSkill = equippedSkills[0];
+                selectedSkillIndex = 0;
+
+                Debug.Log(equippedSkills[0].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha2))
+            {
+                setImageActive(1);
+
+                Debug.Log("设置为2");
+                currentSkill = equippedSkills[1];
+                selectedSkillIndex = 1;
+
+                Debug.Log(equippedSkills[1].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha3))
+            {
+                setImageActive(2);
+
+                Debug.Log("设置为3");
+                currentSkill = equippedSkills[2];
+                selectedSkillIndex = 2;
+
+                Debug.Log(equippedSkills[2].name);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Alpha4) )
+            {
+                setImageActive(3);
+
+                Debug.Log("设置为4");
+                currentSkill = equippedSkills[3];
+                selectedSkillIndex = 3;
+
+                Debug.Log(equippedSkills[3].name);
+            }
+        }
         
-        if (Input.GetKeyDown(KeyCode.Alpha1) && equippedSkills.Count > 0)
-        {
-            setImageActive(0);
-            Debug.Log("设置为1");
-            currentSkill = equippedSkills[0];
-            Debug.Log(equippedSkills[0].name);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2) && equippedSkills.Count > 1)
-        {
-            setImageActive(1);
-
-            Debug.Log("设置为2");
-            currentSkill = equippedSkills[1];
-            Debug.Log(equippedSkills[1].name);
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3) && equippedSkills.Count > 2)
-        {
-            setImageActive(2);
-
-            Debug.Log("设置为3");
-            currentSkill = equippedSkills[2];
-            Debug.Log(equippedSkills[2].name);
-
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4) && equippedSkills.Count > 3)
-        {
-            setImageActive(3);
-
-            Debug.Log("设置为4");
-            currentSkill = equippedSkills[3];
-            Debug.Log(equippedSkills[3].name);
-        }
     }
 
     void setImageActive(int index)
     {
         clearImageActive();
         Debug.Log("开始设置");
-        var imageGameObject = SkillUI.instance.skillContainers[index].transform.Find("skillPanel(Clone)/SkillImage/Image").gameObject;
-        if (imageGameObject != null) {
-            imageGameObject.SetActive(true);  // 激活 GameObject
-        } else {
+        var imageGameObject = SkillUI.instance.skillContainers[index].transform
+            .Find("skillPanel(Clone)/SkillImage/Image").gameObject;
+        if (imageGameObject != null)
+        {
+            imageGameObject.SetActive(true); // 激活 GameObject
+        }
+        else
+        {
             Debug.LogError("Image GameObject not found.");
         }
     }
 
     void clearImageActive()
     {
-        for(int i =0;i<4;i++)
+        for (int i = 0; i < 4; i++)
         {
-            var imageGameObject = SkillUI.instance.skillContainers[i].transform.Find("skillPanel(Clone)/SkillImage/Image").gameObject;
-            if (imageGameObject != null) {
-                imageGameObject.SetActive(false);  // 激活 GameObject
-            } else {
-                Debug.LogError("Image GameObject not found.");
-            }
-        }
-    }
-
-    void HandleSkillUsage()
-    {
-        if (currentSkill.name == "attack")
-        {
-            if (Input.GetMouseButtonDown(0) && canAttack)
+            if (SkillUI.instance.skillContainers[i].transform.Find("skillPanel(Clone)/SkillImage/Image") != null)
             {
-                Debug.Log("使用技能: " + currentSkill.name);
-                canAttack = false;
-                int att_value = Random.Range(0, 100);
-                WeaponAS.Play();
-                if (att_value <= playerData.CriticalRate)
+                var imageGameObject = SkillUI.instance.skillContainers[i].transform
+                    .Find("skillPanel(Clone)/SkillImage/Image").gameObject;
+                if (imageGameObject != null)
                 {
-                    isCritical = true;
+                    imageGameObject.SetActive(false); // 激活 GameObject
                 }
                 else
                 {
-                    isCritical = false;
+                    Debug.LogError("Image GameObject not found.");
                 }
-
-                animator.SetBool("Critical", isCritical);
-                animator.SetTrigger("Attack");
-                
-                GameObject skillContainer = SkillUI.instance.skillContainers[0]; // 假设攻击技能容器的下标为0
-                // AddGlowEffect(skillContainer);
             }
-            // 这里添加实际的技能使用代码，例如播放动画、生成效果等
         }
     }
-    
+
     private void Awake()
     {
         instance = this;
@@ -204,7 +284,7 @@ public class PlayerController : PlayerMovement
 
     IEnumerator SPCheck()
     {
-        while (true && GameManager.instance.curStatus == Status.Game)
+        while (true && (GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
         {
             if (isRun)
             {
@@ -224,7 +304,6 @@ public class PlayerController : PlayerMovement
             yield return new WaitForSeconds(1);
         }
     }
-
 
 
     PlayerData DefaultPlayerData()
@@ -248,11 +327,11 @@ public class PlayerController : PlayerMovement
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.instance.curStatus == Status.Game)
+        if ((GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
         {
             HandleSkillSelection();
-            HandleSkillUsage();
-            
+            SkillFunctions.instance.HandleSkillUsage(currentSkill);
+
             bool isMove = MovePlayer(GroundLayer);
             animator.SetBool("Walk", isMove);
 
@@ -271,7 +350,6 @@ public class PlayerController : PlayerMovement
                     animator.SetBool("Run", isRun);
                 }
             }
-
 
             if (Input.GetKeyUp(KeyCode.LeftShift))
             {
@@ -297,19 +375,64 @@ public class PlayerController : PlayerMovement
                 MoveToLocation();
             }
 
-
-            
-
             if (isInvincible)
             {
                 InvincibleTime();
             }
 
-            if (!canAttack)
+            if (playerData.ShieldValue <= 0)
             {
-                AttackCoolTime();
+                // 停止护盾特效
+                if (SkillFunctions.instance.shieldParticles != null)
+                {
+                    SkillFunctions.instance.shieldParticles.Stop();
+                }
             }
 
+            var skillCanAttackCopy = new Dictionary<string, bool>(skillCanAttack);
+            var skillCanAttackIsStartCopy = new Dictionary<string, bool>(skillCanAttackIsStart);
+          
+            foreach (var canAttack in skillCanAttackCopy)
+            {
+
+                if (!canAttack.Value&& !skillCanAttackIsStartCopy[canAttack.Key])
+                {
+                    Debug.Log("!SAD:  "+canAttack.Key);
+                    Debug.Log("!SAD:  "+canAttack.Value);
+                    // skillCanAttack.Add(canAttack.Key+"isStart",true);
+
+                    switch (canAttack.Key)
+                    {
+                        
+                        case "Shield awarded":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 5);
+                            break;
+                        case "Add maximum health":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 7);
+                            break;
+                        case "Atk Up":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 3);
+                            break;
+                        case "lasers":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 9);
+                            break; 
+                        case "bleed":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 5);
+                            break; 
+                        case "bomb":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD + 3);
+                            break;
+                        case "Sword throwing":
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD );
+                            break;
+                        default:
+                            SkillFunctions.instance.AttackCoolTime(canAttack.Key, attackCD);
+                            break;
+                    }
+                }
+            }
+
+            
             CheckDeath();
             CheckLevelUp();
             playerData.Location = transform.position;
@@ -350,28 +473,12 @@ public class PlayerController : PlayerMovement
             Debug.Log("Collected a skill coin.");
             SkillCoinManager.instance.CoinCollected();
         }
-    }
-
-
-    private void AttackCoolTime()
-    {
-        
-
-        if (!canAttack)
+        if (other.tag == "bossAttack"  )
         {
-            check_att_time += Time.deltaTime;
-            float cooldownRatio = check_att_time / attackCD;
-            SkillUI.instance.skillContainers[selectedSkillIndex].transform.Find("skillPanel(Clone)/SkillImage/cover").GetComponent<Image>().fillAmount = 1 - cooldownRatio;
-
-            if (check_att_time >= attackCD)
-            {
-                canAttack = true;
-                check_att_time = 0;
-                SkillUI.instance.skillContainers[selectedSkillIndex].transform.Find("skillPanel(Clone)/SkillImage/cover").GetComponent<Image>().fillAmount = 0; // 完全填充表示冷却完成
-            }
+            Debug.Log("激光攻击");
+            GetHurt(2);
         }
     }
-
 
 
     private void InvincibleTime()
@@ -414,8 +521,27 @@ public class PlayerController : PlayerMovement
 
     public void GetHurt(int damage)
     {
-        playerData.CurHealth -= damage;
-        isInvincible = true;
+        if (playerData.ShieldValue > 0)
+        {
+            playerData.ShieldValue -= damage;
+            UIManager.instance.Sheildbar.fillAmount = PlayerController.instance.playerData.ShieldValue / 50;
+            UIManager.instance.ShieldValue.text =
+                PlayerController.instance.playerData.ShieldValue.ToString() + " / " + 50;
+
+            if (playerData.ShieldValue < 0)
+            {
+                playerData.ShieldValue = 0;
+                UIManager.instance.Sheildbar.fillAmount = PlayerController.instance.playerData.ShieldValue / 50;
+                UIManager.instance.ShieldValue.text =
+                    PlayerController.instance.playerData.ShieldValue.ToString() + " / " + 50;
+                ChargingParticlesController.instance.destory();
+            }
+        }
+        else
+        {
+            playerData.CurHealth -= damage;
+            isInvincible = true;
+        }
     }
 
     public void GetExp(float exp)

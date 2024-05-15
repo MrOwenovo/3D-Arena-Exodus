@@ -1,13 +1,21 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ObstacleGenerator : MonoBehaviour
 {
-    private int mapSize = 31;
-    private bool[,] mapOccupied;
+    public static  ObstacleGenerator insatance;
+    public int mapSize = 31;
+    public bool[,] mapOccupied;
     private Vector3 centerPosition;
     private bool isObstaclesGenerated = false;
+    public List<GameObject> generatedObstacles = new List<GameObject>(1000);
+    public void Awake()
+    {
+        insatance = this;
+    }
 
     void Start()
     {
@@ -17,7 +25,7 @@ public class ObstacleGenerator : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.instance.curStatus == Status.Game && !isObstaclesGenerated)
+        if ((GameManager.instance.curStatus == Status.Game) && !isObstaclesGenerated)
         {
             GameObject centerBlock = GameObject.Find("MapBlock_20_1_20");
             if (centerBlock != null)
@@ -33,7 +41,7 @@ public class ObstacleGenerator : MonoBehaviour
             PlaceCenterBlock();
             isObstaclesGenerated = true; 
         }
-        else if (GameManager.instance.curStatus != Status.Game)
+        else if (!(GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
         {
             isObstaclesGenerated = false; 
         }
@@ -54,6 +62,7 @@ public class ObstacleGenerator : MonoBehaviour
             if (x >= 0 && x < mapSize && z >= 0 && z < mapSize && !mapOccupied[(int)x, (int)z]) // Check bounds
             {
                 GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                generatedObstacles.Add(cube);
                 bool isTall = currentTallObstacles < tallObstaclesNeeded;
                 float height = isTall ? 2f : 1f;
                 

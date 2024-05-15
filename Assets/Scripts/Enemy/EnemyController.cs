@@ -7,7 +7,6 @@ using UnityEngine.UI;
 
 public class EnemyController : MonoBehaviour
 {
-    
     public Animator animator;
     public GameObject BarHolderPrefab;
     public Transform BarPoint;
@@ -25,6 +24,8 @@ public class EnemyController : MonoBehaviour
     public bool isGetHit = false;
     public float timer = 0;
     public AudioSource GetHitAS;
+    public GameObject staticPrefab;
+    public GameObject bleedPrefab;
 
     public bool isDead = false;
     public float deadTimer = 0;
@@ -41,22 +42,24 @@ public class EnemyController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        if(GameManager.instance.curStatus == Status.Game && !isDead)
+        if (GameManager.instance.curStatus == Status.Game && !isDead)
         {
-            if(healthBar != null)
+            if (healthBar != null)
             {
                 healthBar.transform.position = BarPoint.position;
                 healthBar.transform.LookAt(main_cam.position);
-
             }
-            if(!PlayerController.instance.isAttacking)
+
+            if (!PlayerController.instance.isAttacking)
             {
                 isGetHit = false;
             }
-            if(gameObject.GetComponent<NavMeshAgent>()== null) { 
+
+            if (gameObject.GetComponent<NavMeshAgent>() == null)
+            {
                 gameObject.AddComponent<NavMeshAgent>();
             }
+
             agent = gameObject.GetComponent<NavMeshAgent>();
             if (agent.isOnNavMesh)
             {
@@ -69,27 +72,27 @@ public class EnemyController : MonoBehaviour
 
             // speed up
             timer += Time.deltaTime;
-            if(timer > 6) {
+            if (timer > 6)
+            {
                 agent.speed += 0.5f;
-                animator.SetFloat("Run",agent.speed);
+                animator.SetFloat("Run", agent.speed);
                 timer = 0;
             }
 
             CheckDeath();
-            healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount = enemyData.CurHealth / enemyData.MaxHealth;
+            healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount =
+                enemyData.CurHealth / enemyData.MaxHealth;
             enemyData.Location = transform.position;
-
-        }else if (isDead)
+        }
+        else if (isDead)
         {
             deadTimer += Time.deltaTime;
-            if(deadTimer > 1)
+            if (deadTimer > 1)
             {
                 Destroy(gameObject);
                 Destroy(healthBar);
-
             }
         }
-
     }
 
     private void CheckDeath()
@@ -105,15 +108,67 @@ public class EnemyController : MonoBehaviour
             //Destroy(healthBar);
         }
     }
+    public void TakeDamage(int damage)
+    {
+        Debug.Log("受到了+"+damage);
+        Debug.Log("蓄力攻击");
 
+        GetHitAS.Play();
+        GetDamage(damage);
+        isGetHit = true;
+    }
     private void OnTriggerEnter(Collider other)
     {
-       
-        if(other.tag == "Weapon" && !isGetHit && PlayerController.instance.isAttacking)
+        if (other.tag == "Weapon" && !isGetHit && PlayerController.instance.isAttacking)
+        {
+            if ( SkillFunctions.instance.isChargingAttack)
+            {
+                Debug.Log("蓄力攻击");
+
+                GetHitAS.Play();
+                GetDamage(0, 4);
+                isGetHit = true;
+                SkillFunctions.instance.isChargingAttack = false;
+            }
+            else
+            {
+                Debug.Log("普通攻击");
+                GetHitAS.Play();
+                GetDamage();
+                isGetHit = true;
+            }
+           
+        }
+        if (other.tag == "laser")
+        {
+            Debug.Log("激光攻击");
+
+            GetHitAS.Play();
+            GetDamage(0, 4);
+            isGetHit = true;
+        }
+        if (other.tag == "bleed"  )
         {
             GetHitAS.Play();
-            GetDamage();
+            GetDamage(0,4);
             isGetHit = true;
+            
+        }
+        if (other.tag == "sword"  )
+        {
+            GetHitAS.Play();
+            GetDamage(5,0);
+            isGetHit = true;
+        }
+        if (other.CompareTag("bomb"))
+        {
+            other.transform.parent = transform;  // Make the bomb a child of the enemy
+            other.transform.localPosition = Vector3.zero;  // Set the local position to zero to align it with the enemy's position
+            other.gameObject.GetComponent<Rigidbody>().isKinematic = true;  // Disable physics to stick the bomb
+
+
+            StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
+            Debug.Log("Bomb has attached to the enemy.");
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -126,9 +181,58 @@ public class EnemyController : MonoBehaviour
     {
         if (other.tag == "Weapon" && !isGetHit && PlayerController.instance.isAttacking)
         {
+            
+            if ( SkillFunctions.instance.isChargingAttack)
+            {
+                Debug.Log("蓄力攻击");
+
+                GetHitAS.Play();
+                GetDamage(0, 4);
+                isGetHit = true;
+                SkillFunctions.instance.isChargingAttack = false;
+            }
+            else
+            {
+                Debug.Log("普通攻击");
+                GetHitAS.Play();
+                GetDamage();
+                isGetHit = true;
+            }
+            SkillFunctions.instance.chargeProgress = 0f;
+            SkillFunctions.instance.chargingParticles.Stop();
+            SkillFunctions.instance.chargingParticles.Clear();
+        }
+        
+        if (other.tag == "laser"  )
+        {
+            Debug.Log("激光攻击");
+
             GetHitAS.Play();
             GetDamage();
             isGetHit = true;
+        }
+        if (other.tag == "bleed"  )
+        {
+            GetHitAS.Play();
+            GetDamage(0,4);
+            isGetHit = true;
+            
+        }
+        if (other.tag == "sword"  )
+        {
+            GetHitAS.Play();
+            GetDamage(5,0);
+            isGetHit = true;
+        }
+        if (other.CompareTag("bomb"))
+        {
+            other.transform.parent = transform;  // Make the bomb a child of the enemy
+            other.transform.localPosition = Vector3.zero;  // Set the local position to zero to align it with the enemy's position
+            other.gameObject.GetComponent<Rigidbody>().isKinematic = true;  // Disable physics to stick the bomb
+
+
+            StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
+            Debug.Log("Bomb has attached to the enemy.");
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -136,22 +240,48 @@ public class EnemyController : MonoBehaviour
             PlayerController.instance.isInvincible = true;
         }
     }
-
-    public void GetDamage()
+    IEnumerator DestroyBombAfterDelay(GameObject bomb, float delay)
     {
-        if(enemyData.CurHealth > 0)
+        
+        yield return new WaitForSeconds(delay);  // Wait for the specified delay
+        Destroy(bomb);  // Destroy the bomb object
+        GetDamage(0,4);
+        Debug.Log("Bomb has been destroyed after " + delay + " seconds.");
+    }
+
+
+    public void GetDamage(int damage = 0, float rate = 0)
+    {
+        if (enemyData.CurHealth > 0)
         {
-            if(PlayerController.instance.isCritical)
+            if ((damage == 0 && rate == 0))
             {
-                enemyData.CurHealth -= PlayerController.instance.playerData.Attack * 2;
-            }
-            else
-            {
-                enemyData.CurHealth -= PlayerController.instance.playerData.Attack;
+                if (PlayerController.instance.isCritical)
+                {
+                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* 2);
+                    enemyData.CurHealth -= PlayerController.instance.playerData.Attack * 2;
+                }
+                else
+                {
+                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack);
+
+                    enemyData.CurHealth -= PlayerController.instance.playerData.Attack;
+                }
             }
 
-            
+            if (damage != null && damage > 0)
+            {
+                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack+ damage);
 
+                enemyData.CurHealth -= PlayerController.instance.playerData.Attack + damage;
+            }
+
+            if (rate != null && rate > 0)
+            {
+                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* rate);
+
+                enemyData.CurHealth -= PlayerController.instance.playerData.Attack * rate;
+            }
         }
     }
 
@@ -159,6 +289,5 @@ public class EnemyController : MonoBehaviour
     {
         //transform.position = data.Location;
         enemyData = data;
-        
     }
 }

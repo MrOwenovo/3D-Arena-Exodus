@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Button = UnityEngine.UIElements.Button;
 
 public class UIManager : MonoBehaviour
 {
@@ -17,19 +18,23 @@ public class UIManager : MonoBehaviour
 
     public Image SPbar;
     public Image HPbar;
+    public Image Sheildbar;
     public Image Exbar;
 
     public Text TimeValue;
     public Text HPValue;
+    public Text ShieldValue;
     public Text SPValue;
     public Text EXPValue;
 
     public Text EnemyKilled;
+    public Text BossHealth;
     public Text PlayerLevel;
     public Text PlayerCoin;
 
     public Text WINtext;
     public Text LOSEText;
+    public Button openSkills;
 
     private void Awake()
     {
@@ -39,7 +44,10 @@ public class UIManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        if ((GameManager.instance.curStatus == Status.Game))
+        {
+            BossHealth.text = "";
+        }
     }
     public void ShowCoinCollectedAnimation(Vector3 position)
     {

@@ -11,6 +11,8 @@ public class EnemyGenerator : MonoBehaviour
     public GameObject BoxPrefab;
     public GameObject ETPrefab;
     public GameObject EnemyParent;
+    public GameObject EnemyParentTemplate;
+    public GameObject EnemyParentTraining;
 
     private void Awake()
     {
@@ -105,7 +107,7 @@ public class EnemyGenerator : MonoBehaviour
     rb.velocity = horizontalVelocity + verticalVelocity;
 
     EnemyData turtleData = new EnemyData();
-    turtleData.MaxHealth = 160;
+    turtleData.MaxHealth = 3000;
     turtleData.CurHealth = turtleData.MaxHealth;
     turtleData.Attack = 20;
     turtleData.Exp = 35;

@@ -19,7 +19,7 @@ public class CameraFollower : MonoBehaviour
 
     void Update()
     {
-        if (GameManager.instance.curStatus == Status.Game)
+        if ((GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
         {
             LocateCenterBlock();
             HandleCameraPositionAndRotation();

@@ -77,6 +77,7 @@ GameObject:
   - component: {fileID: 1453633193911286554}
   - component: {fileID: 7385520732415278858}
   - component: {fileID: 4871219456988261259}
+  - component: {fileID: 2393942817939083340}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Untagged
@@ -185,9 +186,12 @@ MonoBehaviour:
   isGetHit: 0
   timer: 0
   GetHitAS: {fileID: 0}
+  staticPrefab: {fileID: 0}
+  bleedPrefab: {fileID: 0}
   isDead: 0
   deadTimer: 0
   skillPrefabs: []
+  circlePrefab: {fileID: 0}
   maxRadius: 5
   expandRate: 1
 --- !u!82 &4871219456988261259
@@ -286,6 +290,22 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &2393942817939083340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2438860687705722339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1a2fdf2a53c446f9b44cf5a7a61e4b3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skillCoinPrefab: {fileID: 4188497090024008533, guid: 5686a1e690622cb4b82406b94eb42e33, type: 3}
+  bossTransform: {fileID: 515982470643011389, guid: d04d5fab47ea74e43b681c6649a99d6d, type: 3}
+  spawnRadius: 15
+  currentSkillCoin: {fileID: 0}
 --- !u!1 &2602886640819227911
 GameObject:
   m_ObjectHideFlags: 0

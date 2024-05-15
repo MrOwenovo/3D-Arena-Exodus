@@ -3,10 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public enum Status
 {
-    Menu,Game,Pause,Over
+    Menu,Game,Pause,Over,Training
 }
 
 public class GameManager : MonoBehaviour
@@ -33,6 +34,9 @@ public class GameManager : MonoBehaviour
     public int minLandHeight = 2;
     // This is the smoothness of the map
     public int smoothness = 20;
+    public Button changeDifficulty;
+    public Button openSkills;
+    public Text changeDifficultyText;
 
 
 
@@ -64,12 +68,22 @@ public class GameManager : MonoBehaviour
     public Vector2 endPoint;
     public Vector2 controlPoint;
 
-    bool isGenerateMap = false;
-    
+    public GameObject guideBook;
 
+    bool isGenerateMap = false;
+
+    public void openGuid()
+    {
+        guideBook.SetActive(true);
+    }
+    public void closeGuid()
+    {
+        guideBook.SetActive(false);
+    }
     private void Awake()
     {
         instance = this;
+        Screen.SetResolution(1920, 1080, true);
     }
 
     // Return the perlin noise value which is between 2 and prefabList.Length
@@ -77,7 +91,35 @@ public class GameManager : MonoBehaviour
     //int GetPerlinNoise(int x, int z){
     //    return Mathf.RoundToInt(Mathf.PerlinNoise(x / smoothness, z / smoothness) * (prefabList.Length - 2)) + 2;
     //}
+    public int difficulty = 1;
+    public void changeDif()
+    {
+        if (difficulty == 1)
+        {
+            difficulty = 2;
+            changeDifficultyText.text = "changeToEasy";
+            BossEnemyController.instance.enemyData.MaxHealth += 2000;
+            BossEnemyController.instance.enemyData.CurHealth += 2000;
+            UIManager.instance.BossHealth.text ="BossHealth: "+ BossEnemyController.instance.enemyData.CurHealth;
+        }else if (difficulty == 2)
+        {
+            difficulty = 1;
+            changeDifficultyText.text = "changeToDifficult";
+            BossEnemyController.instance.enemyData.MaxHealth -= 2000;
+            BossEnemyController.instance.enemyData.CurHealth -= 2000;
+            UIManager.instance.BossHealth.text ="BossHealth: "+ BossEnemyController.instance.enemyData.CurHealth;
 
+
+            if (BossEnemyController.instance.enemyData.CurHealth < 0)
+            {
+                BossEnemyController.instance.enemyData.CurHealth = 0;
+                UIManager.instance.BossHealth.text ="BossHealth: "+ BossEnemyController.instance.enemyData.CurHealth;
+
+            }
+
+        }
+        
+    }
 
     void GenerateMapArray(){
         // Temp variables
@@ -152,7 +194,7 @@ public class GameManager : MonoBehaviour
     // Generate the player
     void GeneratePlayer()
     {
-        Player = Instantiate(playerPrefab, playerInitPosition, Quaternion.identity);
+        Player = Instantiate(playerPrefab, new Vector3(25, 6, 25), Quaternion.identity);
         Player.name = "Player";
         Player.transform.tag = "Player";
         PlayerMovement.maxJumpTimes = 2;
@@ -193,6 +235,7 @@ public class GameManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
+            Debug.Log("按下！！！！！！！！！！sakjdas");
             PauseGame();
         }
         if(curStatus == Status.Game)
@@ -245,6 +288,33 @@ public class GameManager : MonoBehaviour
             isGenerateMap = true;
         }
         
+        StartCoroutine(BakeNavMesh());
+        GeneratePlayer();
+        ToggleSkillStoreVisibility();
+        // SkillUI.instance.storePanel.SetActive(true);
+
+        // IEnumerator enu = GeneratEnemies(wait_time);
+        // StartCoroutine(enu);
+        BossController.instance.isBossGenerated = false;
+    }
+    public void StartTrainingGame()
+    {
+        openSkills.gameObject.SetActive(true);
+        isNewGame = true;
+        // EnemyGenerator.instance.EnemyParent = new GameObject("EnemyParent");
+        Time.timeScale = 1;
+        uiData = new GameUIData();
+        uiData.SurvivalTime = 0;
+        uiData.EnemyKillNum = 0;
+        SwitchGameStatus(Status.Training);
+        if (!isGenerateMap) {
+            GenerateMapArray();
+            MapGenerator.GenerateMap(map, mapSize, mapArray, prefabList);
+            InitSeaCube();
+            isGenerateMap = true;
+        }
+        SkillUI.instance.SetActiveRecursivelyStep2(SkillUI.instance.storePanel, !SkillUI.instance.storePanelTraining.activeSelf);
+
         StartCoroutine(BakeNavMesh());
         GeneratePlayer();
         ToggleSkillStoreVisibility();
@@ -325,10 +395,13 @@ public class GameManager : MonoBehaviour
         }
         StartCoroutine(BakeNavMesh());
         GeneratePlayer();
+        ToggleSkillStoreVisibility();
 
         Data[] allDatas = SaveManager.instance.LoadAllData();
 
         PlayerController.instance.SetData((PlayerData)allDatas[0]);
+      
+        
 
         for(int i = 1; i < allDatas.Length; i++)
         {
@@ -385,15 +458,43 @@ public class GameManager : MonoBehaviour
         SaveManager.instance.SaveAllData(PlayerController.instance.playerData, enemyDatas);
         SaveManager.instance.SaveUIData(uiData);
     }
+
+    private Status currentStatus = Status.Game;
+
+    public void ResumeGame()
+    {
+        MenuEnv.SetActive(false);
+        map.SetActive(true);
+        UIManager.instance.MenuCanvas.enabled = false;
+        UIManager.instance.GameCanvas.enabled = true;
+        UIManager.instance.PauseCanvas.enabled = false;
+        UIManager.instance.OverCanvas.enabled = false;
+        // curStatus = Status.Game;
+        Time.timeScale = 1;
+    }
     public void PauseGame()
     {
-        if(curStatus == Status.Game)
+        Debug.Log(currentStatus);
+        if(currentStatus == Status.Game)
         {
             SwitchGameStatus(Status.Pause);
+            currentStatus = Status.Game;
             Time.timeScale = 0;
-        }else if(curStatus == Status.Pause)
+        }else if(currentStatus == Status.Training)
         {
+            SwitchGameStatus(Status.Pause);
+            currentStatus = Status.Training;
+            Time.timeScale = 1;
+        }else if(currentStatus == Status.Pause&& currentStatus == Status.Game)
+        {
+            Debug.Log("切换到:"+Status.Game);
             SwitchGameStatus(Status.Game);
+            Time.timeScale = 1;
+        }else if(currentStatus == Status.Pause&& currentStatus == Status.Training)
+        {
+            Debug.Log("切换到 :"+Status.Training);
+
+            SwitchGameStatus(Status.Training);
             Time.timeScale = 1;
         }
     }
@@ -402,13 +503,35 @@ public class GameManager : MonoBehaviour
         SwitchGameStatus(Status.Over);
         Debug.Log("GameOver");
         StopAllCoroutines();
+
         GameObject tempEP = EnemyGenerator.instance.EnemyParent;
-        for(int i = 0; i < tempEP.transform.childCount; i++)
+        if (tempEP != null) // 检查 EnemyParent 是否存在
         {
-            tempEP.transform.GetChild(i).GetComponent<Animator>().SetTrigger("Lose");
-            tempEP.transform.GetChild(i).GetComponent<NavMeshAgent>().speed = 0;
+            for(int i = 0; i < tempEP.transform.childCount; i++)
+            {
+                GameObject child = tempEP.transform.GetChild(i).gameObject;
+                if (child != null) // 检查每个子对象是否存在 
+                {
+                    Animator animator = child.GetComponent<Animator>();
+                    if (animator != null) // 检查 Animator 组件是否存在
+                    {
+                        animator.SetTrigger("Lose");
+                    }
+
+                    NavMeshAgent agent = child.GetComponent<NavMeshAgent>();
+                    if (agent != null) // 检查 NavMeshAgent 组件是否存在
+                    {
+                        agent.speed = 0;
+                    }
+                }
+            }
+        }
+        else
+        {
+            Debug.LogWarning("EnemyParent is not found. It might have been destroyed.");
         }
     }
+
 
     //TO DO
     private void GameWin()
@@ -418,27 +541,56 @@ public class GameManager : MonoBehaviour
         StopAllCoroutines();
         Time.timeScale = 0;
     }
+
+    public void clearStore()
+    {
+        PlayerPrefsUtil.DeleteAllPrefs();
+
+    }
     public void BackToMenu()
     {
+        openSkills.gameObject.SetActive(false);
+
         SwitchGameStatus(Status.Menu);
         // TO DO
         AudioManager.instance.SwitchBGM(-1);
         StopAllCoroutines();
         Time.timeScale = 1;
         Destroy(Player);
-        Destroy(EnemyGenerator.instance.EnemyParent);
+        if (EnemyGenerator.instance.EnemyParent != null)
+        {
+            Destroy(EnemyGenerator.instance.EnemyParent);
+        }
+
+        Destroy(BossControllerTraining.instance.temp);
         Transform enemyBars = UIManager.instance.enemyBarsUI.transform;
         for(int i = 0;i < enemyBars.childCount; i++)
         {
             Destroy(enemyBars.GetChild(i).gameObject);
         }
+//
+        UIManager.instance.openSkills.SetEnabled(true);
         SkillUI.instance.SetActiveRecursively(SkillUI.instance.storePanel, false);
+        ObstacleGenerator.insatance.mapOccupied = new bool[ObstacleGenerator.insatance.mapSize, ObstacleGenerator.insatance.mapSize];
+        foreach (GameObject obstacle in ObstacleGenerator.insatance.generatedObstacles)
+        {
+            if (obstacle!=null)
+            {
+                 Destroy(obstacle);
+            }
+        }
+        ObstacleGenerator.insatance.generatedObstacles.Clear();
+        if (SkillCoinManager.instance.currentSkillCoin!=null)
+        {
+            Destroy(SkillCoinManager.instance.currentSkillCoin);
+        }
     }
 
     public void ReStart()
     {
         Destroy(Player);
         Destroy(EnemyGenerator.instance.EnemyParent);
+        Destroy(EnemyGenerator.instance.EnemyParentTraining);
         Transform enemyBars = UIManager.instance.enemyBarsUI.transform;
         for (int i = 0; i < enemyBars.childCount; i++)
         {
@@ -450,6 +602,8 @@ public class GameManager : MonoBehaviour
 
     public void SwitchGameStatus(Status nextStatus)
     {
+        Debug.Log("next:!!! "+nextStatus);
+
         switch (nextStatus)
         {
             case Status.Menu:
@@ -462,6 +616,7 @@ public class GameManager : MonoBehaviour
                 UIManager.instance.GameCanvas.enabled = false;
                 UIManager.instance.PauseCanvas.enabled = false;
                 UIManager.instance.OverCanvas.enabled = false;
+                curStatus = Status.Menu;
                 break;
             case Status.Game:
                 MenuEnv.SetActive(false);
@@ -470,18 +625,33 @@ public class GameManager : MonoBehaviour
                 UIManager.instance.GameCanvas.enabled = true;
                 UIManager.instance.PauseCanvas.enabled = false;
                 UIManager.instance.OverCanvas.enabled = false;
+                curStatus = Status.Game;
+                break;
+            case Status.Training:
+                MenuEnv.SetActive(false);
+                map.SetActive(true);
+                UIManager.instance.MenuCanvas.enabled = false;
+                UIManager.instance.GameCanvas.enabled = true;
+                UIManager.instance.PauseCanvas.enabled = false;
+                UIManager.instance.OverCanvas.enabled = false;
+                curStatus = Status.Training;
                 break;
             case Status.Pause:
                 UIManager.instance.MenuCanvas.enabled = false;
                 UIManager.instance.GameCanvas.enabled = false;
                 UIManager.instance.PauseCanvas.enabled = true;
                 UIManager.instance.OverCanvas.enabled = false;
+                curStatus = Status.Pause;
+                Debug.Log("到pause");
                 break;
+            // 
             case Status.Over:
                 UIManager.instance.MenuCanvas.enabled = false;
                 UIManager.instance.GameCanvas.enabled = false;
                 UIManager.instance.PauseCanvas.enabled = false;
                 UIManager.instance.OverCanvas.enabled = true;
+                UIManager.instance.OverCanvas.gameObject.SetActive(true);
+                curStatus = Status.Over;
                 break;
         }
         curStatus = nextStatus;

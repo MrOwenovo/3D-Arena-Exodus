@@ -13,6 +13,13 @@ public class PlayerData : Data
         get { return max_health; }
         set { max_health = value; }
     }
+    public float max_shield;
+
+    public float MaxShield
+    {
+        get { return max_shield; }
+        set { max_shield = value; }
+    }
 
     public float max_sp;
     public float MaxSp
@@ -46,6 +53,15 @@ public class PlayerData : Data
         set
         {
             attack = value;
+        }
+    }
+    public int shieldValue;
+    public int ShieldValue
+    {
+        get { return shieldValue; }
+        set
+        {
+            shieldValue = value;
         }
     }
 

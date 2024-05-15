@@ -38,6 +38,7 @@ public class SkillManager : MonoBehaviour
    
        if (ownedSkills == null || availableSkills == null || (ownedSkills.Count == 0 && availableSkills.Count == 0))
        {
+           Debug.Log("从头开始");
            // 如果本地没有保存，从头开始加载技能
            GameObject skillsContainer = GameObject.Find("Skills");
            ownedSkills = new List<Skill>();
@@ -49,63 +50,69 @@ public class SkillManager : MonoBehaviour
        // UpdateUIWithSkills();
    }
 
+   void PopulateSkillsRecursive(Transform parent, List<Skill> targetList)
+   {
+       foreach (Transform skillTransform in parent)
+       {
+           SpriteRenderer renderer = skillTransform.GetComponent<SpriteRenderer>();
+           if (renderer != null)
+           {
+               bool isFree = skillTransform.parent.name == "free";
+               Skill skill = new Skill(skillTransform.name, GetCostFromName(skillTransform.name), renderer.sprite, isFree);
+               if (skill.isFree)
+               {
+                   skill.isOwned = true;
+                   ownedSkills.Add(skill);
+               }
+               else
+               {
+                   targetList.Add(skill);
+               }
+           }
+           PopulateSkillsRecursive(skillTransform, targetList);
+       }
+   }
 
-    void PopulateSkillsRecursive(Transform parent, List<Skill> targetList)
-    {
-        foreach (Transform skillTransform in parent)
-        {
-            SpriteRenderer renderer = skillTransform.GetComponent<SpriteRenderer>();
-            if (renderer != null)
-            {
-                bool isFree = skillTransform.parent.name == "free";
-                Skill skill = new Skill(skillTransform.name, GetCostFromName(skillTransform.name), renderer.sprite, isFree);
-                if (skill.isFree)
-                {
-                    skill.isOwned = true;
-                    ownedSkills.Add(skill);
-                    
-                    
-                }
-                else
-                {
-                    targetList.Add(skill);
-                    
 
-                }
-            }
-            PopulateSkillsRecursive(skillTransform, targetList);
-        }
-    }
+
     
-    public void SaveSkills()
-    {
-        // 序列化 ownedSkills 和 availableSkills
-        string ownedSkillsJson = JsonUtility.ToJson(new SkillListWrapper { Skills = ownedSkills });
-        string availableSkillsJson = JsonUtility.ToJson(new SkillListWrapper { Skills = availableSkills });
+   
+   public void SaveSkills()
+   {
+       string ownedSkillsJson = JsonUtility.ToJson(new SkillListWrapper { Skills = ownedSkills });
+       string availableSkillsJson = JsonUtility.ToJson(new SkillListWrapper { Skills = availableSkills });
 
-        PlayerPrefs.SetString("OwnedSkills", ownedSkillsJson);
-        PlayerPrefs.SetString("AvailableSkills", availableSkillsJson);
-        PlayerPrefs.SetInt("SkillCoinsCollected", coins);
-        PlayerPrefs.Save();
-    }
-    public void LoadSkills()
-    {
-        // 加载 ownedSkills 和 availableSkills
-        string ownedSkillsJson = PlayerPrefs.GetString("OwnedSkills", "");
-        string availableSkillsJson = PlayerPrefs.GetString("AvailableSkills", "");
+       PlayerPrefs.SetString("OwnedSkills", ownedSkillsJson);
+       PlayerPrefs.SetString("AvailableSkills", availableSkillsJson);
+       PlayerPrefs.SetInt("SkillCoinsCollected", coins);
+       PlayerPrefs.Save();
+   }
 
-        if (!string.IsNullOrEmpty(ownedSkillsJson))
-        {
-            ownedSkills = JsonUtility.FromJson<SkillListWrapper>(ownedSkillsJson).Skills;
-        }
+   public void LoadSkills()
+   {
+       Debug.Log("Loading skills...");
+       string ownedSkillsJson = PlayerPrefs.GetString("OwnedSkills", "");
+       string availableSkillsJson = PlayerPrefs.GetString("AvailableSkills", "");
 
-        if (!string.IsNullOrEmpty(availableSkillsJson))
-        {
-            availableSkills = JsonUtility.FromJson<SkillListWrapper>(availableSkillsJson).Skills;
-        }
+       if (!string.IsNullOrEmpty(ownedSkillsJson))
+       {
+           ownedSkills = JsonUtility.FromJson<SkillListWrapper>(ownedSkillsJson).Skills;
+           Debug.Log("!!!!??");
+           Debug.Log(ownedSkillsJson);
+       }
 
-        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0);  // 默认为 0 如果没有保存过
-    }
+       if (!string.IsNullOrEmpty(availableSkillsJson))
+       {
+           availableSkills = JsonUtility.FromJson<SkillListWrapper>(availableSkillsJson).Skills;
+           Debug.Log("!!!!??");
+           Debug.Log(availableSkillsJson);
+       }
+
+       coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0);
+       // ReassociateSprites();  // 重新关联 Sprite
+   }
+
+
     [System.Serializable]
     public class SkillListWrapper
     {
@@ -113,8 +120,21 @@ public class SkillManager : MonoBehaviour
     }
     int GetCostFromName(string name)
     {
-        return name.Length * 10;  // Cost based on the length of the name
+        // Check specific names and assign costs accordingly
+        if (name == "bomb" || name == "Sword throwing")
+        {
+            return 3; // Cost for 'bomb' and 'Sword throwing'
+        }
+        else if (name == "bleed" || name == "lasers")
+        {
+            return 6; // Cost for 'bleed' and 'lasers'
+        }
+        else
+        {
+            return 2; // Default cost for all other names
+        }
     }
+
     public Skill GetSkillByName(string skillName)
     {
         // 首先在拥有的技能列表中查找
@@ -176,7 +196,7 @@ public class SkillManager : MonoBehaviour
     void LoadCoins()
     {
         // Load skills and coins from PlayerPrefs or another storage method
-        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0)+500;  // Default to 100 coins if nothing is saved
+        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0)+10;  // Default to 100 coins if nothing is saved
     }
 
     void SaveCoins()
