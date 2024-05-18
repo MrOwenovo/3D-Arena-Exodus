@@ -25,11 +25,12 @@ public class BossController : MonoBehaviour
     {
         if (GameManager.instance.curStatus == Status.Game && !isBossGenerated)
         {
-            Debug.Log("生成boss");
+             ;
             DeployBoss();
             isBossGenerated = true;
         }
-        else if (GameManager.instance.curStatus != Status.Game)
+        else if (GameManager.instance.curStatus != Status.Game&&GameManager.instance.curStatus != Status.Pause
+                 )
         {
             isBossGenerated = false;
         }
@@ -55,22 +56,17 @@ public class BossController : MonoBehaviour
 
     GameObject DefaultBossData(Vector3 check_point)
     {
-        // 随机选择一个模型预制体
         GameObject modelPrefab = GetRandomModelPrefab();
 
-        // 实例化模型预制体
         GameObject temp = Instantiate(modelPrefab, check_point - new Vector3(0, 3, 0), Quaternion.identity);
         temp.transform.parent = EnemyGenerator.instance.EnemyParent.transform;
 
-        // 获取 bossPrefab 中的 MeshFilter 组件
         MeshFilter bossMeshFilter = bossPrefab.GetComponentInChildren<MeshFilter>();
         if (bossMeshFilter != null)
         {
-            // 获取实例化对象中需要替换的 MeshFilter 组件
             MeshFilter instanceMeshFilter = temp.GetComponentInChildren<MeshFilter>();
             if (instanceMeshFilter != null)
             {
-                // 替换模型网格
                 instanceMeshFilter.sharedMesh = bossMeshFilter.sharedMesh;
             }
         }
@@ -93,7 +89,7 @@ public class BossController : MonoBehaviour
         switch (randomIndex)
         {
             case 0:
-                return bossPrefab; // 使用 bossPrefab 自身
+                return bossPrefab;  
             case 1:
                 return bossPrefab2;
             case 2:
@@ -101,7 +97,7 @@ public class BossController : MonoBehaviour
             case 3:
                 return bossPrefab4;
             default:
-                return bossPrefab; // 默认使用 bossPrefab 自身
+                return bossPrefab;  
         }
     }
 

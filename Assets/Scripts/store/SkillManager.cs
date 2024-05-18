@@ -8,8 +8,8 @@ public class SkillManager : MonoBehaviour
     public List<Skill> ownedSkills = new List<Skill>();
     public List<Skill> availableSkills = new List<Skill>();
     public List<Skill> equippedSkills = new List<Skill>(new Skill[4]);  // 4 skill slots
-    private int coins = 0;  // 假设玩家开始时有100个硬币
-    public Text coinsText;  // 显示硬币数量的UI组件
+    private int coins = 0;  
+    public Text coinsText;   
 
     void Awake()
     {
@@ -34,19 +34,17 @@ public class SkillManager : MonoBehaviour
 
    void PopulateSkills()
    {
-       LoadSkills();  // 尝试从 PlayerPrefs 加载技能列表
+       LoadSkills();  
    
        if (ownedSkills == null || availableSkills == null || (ownedSkills.Count == 0 && availableSkills.Count == 0))
        {
-           Debug.Log("从头开始");
-           // 如果本地没有保存，从头开始加载技能
+            ;
            GameObject skillsContainer = GameObject.Find("Skills");
            ownedSkills = new List<Skill>();
            availableSkills = new List<Skill>();
            PopulateSkillsRecursive(skillsContainer.transform, availableSkills);
        }
    
-       // 同步技能状态到 UI 或其他系统
        // UpdateUIWithSkills();
    }
 
@@ -90,26 +88,26 @@ public class SkillManager : MonoBehaviour
 
    public void LoadSkills()
    {
-       Debug.Log("Loading skills...");
+        ;
        string ownedSkillsJson = PlayerPrefs.GetString("OwnedSkills", "");
        string availableSkillsJson = PlayerPrefs.GetString("AvailableSkills", "");
 
        if (!string.IsNullOrEmpty(ownedSkillsJson))
        {
            ownedSkills = JsonUtility.FromJson<SkillListWrapper>(ownedSkillsJson).Skills;
-           Debug.Log("!!!!??");
-           Debug.Log(ownedSkillsJson);
+            ;
+            
        }
 
        if (!string.IsNullOrEmpty(availableSkillsJson))
        {
            availableSkills = JsonUtility.FromJson<SkillListWrapper>(availableSkillsJson).Skills;
-           Debug.Log("!!!!??");
-           Debug.Log(availableSkillsJson);
+            ;
+            
        }
 
        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0);
-       // ReassociateSprites();  // 重新关联 Sprite
+       // ReassociateSprites();  
    }
 
 
@@ -137,34 +135,30 @@ public class SkillManager : MonoBehaviour
 
     public Skill GetSkillByName(string skillName)
     {
-        // 首先在拥有的技能列表中查找
         foreach (var skill in ownedSkills)
         {
             if (skill.name.Equals(skillName))
                 return skill;
         }
 
-        // 如果未找到，在可购买的技能列表中查找
         foreach (var skill in availableSkills)
         {
             if (skill.name.Equals(skillName))
                 return skill;
         }
 
-        // 如果还未找到，检查装备的技能
         foreach (var skill in equippedSkills)
         {
             if (skill != null && skill.name.Equals(skillName))
                 return skill;
         }
 
-        // 如果都没有找到，返回 null
         return null;
     }
 
     public bool BuySkill(Skill skill)
     {
-        Debug.Log("Attempting to buy skill: " + skill.name);
+         
         if (coins >= skill.cost && !skill.isOwned)
         {
             skill.isOwned = true;
@@ -176,13 +170,13 @@ public class SkillManager : MonoBehaviour
             UpdateCoinDisplay();
             SkillUI.instance.UpdateSkillPanels();
             MessageManager.instance.ShowMessage("Skill purchased successfully: " + skill.name);
-            Debug.Log("Skill purchased successfully.");
+             ;
             return true;
         }
         else
         {
             MessageManager.instance.ShowMessage("Insufficient coins to purchase skill: " + skill.name);
-            Debug.Log("Failed to purchase skill: insufficient coins.");
+             ;
             return false;
         }
     }
@@ -196,7 +190,7 @@ public class SkillManager : MonoBehaviour
     void LoadCoins()
     {
         // Load skills and coins from PlayerPrefs or another storage method
-        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0)+10;  // Default to 100 coins if nothing is saved
+        coins = PlayerPrefs.GetInt("SkillCoinsCollected", 0)+30;  // Default to 100 coins if nothing is saved
     }
 
     void SaveCoins()

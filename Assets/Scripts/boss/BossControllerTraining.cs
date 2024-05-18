@@ -17,23 +17,23 @@ public class BossControllerTraining : MonoBehaviour
 
     private IEnumerator WaitForTemplateAndInstantiate()
     {
-        // 等待直到 EnemyGenerator 的实例和 EnemyParentTemplate 都不为 null
+         
         while (EnemyGenerator.instance == null || EnemyGenerator.instance.EnemyParentTemplate == null)
         {
             yield return new WaitForSeconds(0.1f); // 每次检查间隔0.1秒，防止过度消耗性能
         }
 
-        // 当条件满足后，进行实例化
+    
         // bossInstanceStatic = Instantiate(EnemyGenerator.instance.EnemyParentTemplate);
 
         bossInstanceStatic = EnemyGenerator.instance.EnemyParentTemplate;
-        Debug.Log("EnemyParentTemplate has been instantiated.");
+         
     }
 
     private void Awake()
     {
         instance = this;
-        // 启动协程
+      
         StartCoroutine(WaitForTemplateAndInstantiate());
     }
 
@@ -44,7 +44,7 @@ public class BossControllerTraining : MonoBehaviour
             DeployBoss();
             isBossGenerated = true;
         }
-        else if (GameManager.instance.curStatus != Status.Training)
+        else if (GameManager.instance.curStatus != Status.Training&&GameManager.instance.curStatus != Status.Pause)
         {
             isBossGenerated = false;
         }

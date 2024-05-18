@@ -39,7 +39,7 @@ public class SkillCoinManager : MonoBehaviour
         if ((GameManager.instance.curStatus == Status.Game))
         {
             Vector3 randomDirection = Random.insideUnitSphere * spawnRadius;
-            randomDirection.y = 0; // 确保硬币在地面高度生成
+            randomDirection.y = 0;  
 
             Vector3 spawnLocation = bossTransform.position + randomDirection + new Vector3(0, 0.5f, 0);
             currentSkillCoin = Instantiate(skillCoinPrefab, spawnLocation, Quaternion.identity);

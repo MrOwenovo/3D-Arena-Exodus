@@ -16,8 +16,12 @@ public class BossEnemyController : EnemyController
     public float expandRate = 1f;
     private float radius = 0.0f;
     private bool isAttacking = false;
-    private new GameObject healthBar;
+    // private new GameObject healthBar;
     Vector3 centerPosition;
+    
+    
+    private bool timerStarted = false;
+    private float timeSinceGameStarted;
     private void Awake()
     {
         instance = this;
@@ -26,6 +30,7 @@ public class BossEnemyController : EnemyController
     // Start is called before the first frame update
     void Start()
     {
+        
         // agent.enabled = false; // 禁用NavMeshAgent以固定Boss位置
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.startWidth = 0.05f;
@@ -74,6 +79,10 @@ public class BossEnemyController : EnemyController
     // Update is called once per frame
     void Update()
     {
+        if (!timerStarted && GameManager.instance.curStatus == Status.Game) {
+            StartCoroutine(GameStartTimer());
+            timerStarted = true;
+        }
         if ((GameManager.instance.curStatus == Status.Game)&&isEnd)
         {
             isEnd = false;
@@ -121,8 +130,8 @@ public class BossEnemyController : EnemyController
             CheckDeath();
             this.healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount =
                 enemyData.CurHealth / enemyData.MaxHealth;
-            Debug.Log("设置血量:"+enemyData.CurHealth / enemyData.MaxHealth);
-            Debug.Log(this.healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount);
+             
+             
             enemyData.Location = transform.position;
             UIManager.instance.BossHealth.text = "BossHealth"+enemyData.CurHealth;
         }
@@ -138,6 +147,9 @@ public class BossEnemyController : EnemyController
         
         if (isStatic && isBleed)
         {
+            staticPrefabIsGenerated = false;
+            bleedPrefabIsGenerated = false;
+
             // 销毁staticPrefab和bleedPrefab
             if (staticPrefab != null)
             {
@@ -158,7 +170,7 @@ public class BossEnemyController : EnemyController
             ConfigureParticleEffect(particleSystem);
             Destroy(effect, 2.0f); // 2秒后销毁效果
 
-            Debug.Log("元素反应！");
+             
             // 调用GetDamage方法扣除Boss血量
             GetDamage(0, 10);
 
@@ -194,12 +206,14 @@ public class BossEnemyController : EnemyController
         DeploySkill(0);
         yield return new WaitForSeconds(1);
         DeploySkill(1);
-        yield return new WaitForSeconds(1);
+        DeploySkill(4);
+        yield return new WaitForSeconds(2);
         DeploySkill(2);
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(3);
         DeploySkill(3);
 
         yield return new WaitForSeconds(5);
+        DeploySkill(0);
         isEnd = true;
         ;
 
@@ -215,9 +229,39 @@ public class BossEnemyController : EnemyController
                 var range = Random.Range(0, 4);
                 Vector3 spawnPosition = transform.position + new Vector3(Random.Range(-5, 6), 0, Random.Range(-5, 6));
                 EnemyGenerator.instance.DeployEnemies(range, spawnPosition);
+                
+                
+                 
+
+               
+                Vector3 bossPosition2 = this.transform.position;   
+
+
+                Vector3 playerPosition2=bossPosition2;
+                if (GameManager.instance.Player!=null)
+                {
+                    playerPosition2 = GameManager.instance.Player.transform.position;
+                }
+               
+                GameObject sword = Instantiate(PlayerController.instance.swordPrefab, bossPosition2,
+                    Quaternion.identity);
+
+                sword.tag = "bossAttack";
+
+                sword.transform.localScale = new Vector3(5f, 5f, 5f);
+                sword.transform.LookAt(playerPosition2);
+
+                // Optionally add a Rigidbody and apply a force to "throw" the sword
+                Rigidbody rb = sword.AddComponent<Rigidbody>();
+                rb.useGravity = false; // Assume you want the sword to fly straight
+                Vector3 direction = (playerPosition2 - sword.transform.position).normalized;
+                rb.AddForce(direction * 500f); // Adjust force as necessary
+
+                // Destroy the sword after some time to clean up
+                Destroy(sword, 1.0f);
                 break;
             case 1:
-                StartCoroutine(ActivateShockwave(transform.position));
+                // StartCoroutine(ActivateShockwave(transform.position));
                 break;
             case 2:
                 if (GameManager.instance.difficulty==2)
@@ -231,61 +275,91 @@ public class BossEnemyController : EnemyController
             case 3:
                 if (GameManager.instance.difficulty == 2)
                 {
-                    Debug.Log("Boss使用技能: ");
-
-                    // 获取Boss和玩家的位置
-                    Vector3 bossPosition = this.transform.position;  // 假设这个脚本附加在Boss对象上
+                     
+                    Vector3 bossPosition = this.transform.position;   
                     Vector3 playerPosition = GameManager.instance.Player.transform.position;
 
-                    // 实例化激光预制体并设置位置和方向
+                    
                     GameObject laser = Instantiate(PlayerController.instance.laserPrefab, bossPosition, Quaternion.identity);
                     laser.tag = "bossAttack";
-                    laser.transform.LookAt(playerPosition);  // 使激光朝向玩家
-
-                    // 设置激光的比例和LineRenderer组件
+                    laser.transform.LookAt(playerPosition);   
+                   
                     laser.transform.localScale = new Vector3(4, 4, 4);
                     LineRenderer lineRenderer = laser.GetComponent<LineRenderer>();
                     if (lineRenderer != null)
                     {
                         lineRenderer.enabled = true;
-                        lineRenderer.startWidth = 0.1f;  // 根据需要调整线的宽度
+                        lineRenderer.startWidth = 0.1f;   
                         lineRenderer.endWidth = 0.1f;
-                        lineRenderer.SetPositions(new Vector3[] { bossPosition, playerPosition });  // 设置激光的起始和结束位置
+                        lineRenderer.SetPositions(new Vector3[] { bossPosition, playerPosition });  
                     }
 
-                    Destroy(laser, 1.0f); // 1秒后销毁激光
+                    Destroy(laser, 1.0f);  
                 }
                 else
                 {
-                    Debug.Log("Boss技能未激活，因为难度不是2");
+                     
                 }
 
                 break;
             case 4:
+                if (GameManager.instance.difficulty == 2)
+                {
+                     
+
+                 
+                    Vector3 bossPosition = this.transform.position;   
+                    Vector3 playerPosition = GameManager.instance.Player.transform.position;
+
+                    GameObject sword2 = Instantiate(PlayerController.instance.swordPrefab, bossPosition,
+                        Quaternion.identity);
+
+                    sword2.tag = "bossAttack";
+
+                    sword2.transform.localScale = new Vector3(5f, 5f, 5f);
+                    sword2.transform.LookAt(playerPosition);
+
+                    // Optionally add a Rigidbody and apply a force to "throw" the sword
+                    Rigidbody rb2 = sword2.AddComponent<Rigidbody>();
+                    rb2.useGravity = false; // Assume you want the sword to fly straight
+                    Vector3 direction2 = (playerPosition - sword2.transform.position).normalized;
+                    rb2.AddForce(direction2 * 500f); // Adjust force as necessary
+
+                    // Destroy the sword after some time to clean up
+                    Destroy(sword2, 1.0f);
+                    
+                    GameObject bleedEffect = Instantiate(PlayerController.instance.bleedPrefab, playerPosition + Vector3.down * 5f, Quaternion.identity);
+                    bleedEffect.tag = "bossAttack";
+
+                    StartCoroutine(SkillFunctions.instance.AnimateBleedEffect(bleedEffect));
+                }
+                else
+                {
+                     
+                }
+
                 break;
         }
     }
     IEnumerator ActivateShockwave(Vector3 origin)
     {
-        Debug.Log("释放!!");
+         
         GameObject shockwave = new GameObject("Shockwave");
-        // shockwave.layer = LayerMask.NameToLayer("Shockwave"); // 将冲击波设置为特殊层
 
         shockwave.transform.position = origin;
         shockwave.transform.rotation = Quaternion.Euler(0, 0, 0);
         shockwave.AddComponent<SphereCollider>().isTrigger = true;
 
-        // 创建空心圆环
         GameObject ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
         ring.transform.parent = shockwave.transform;
         ring.transform.localPosition = Vector3.zero;
         ring.transform.localRotation = Quaternion.identity;
-        ring.transform.localScale = new Vector3(0.1f, 0.05f, 0.1f); // 初始缩放比例
+        ring.transform.localScale = new Vector3(0.1f, 0.05f, 0.1f);  
 
         GameObject hole = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         hole.transform.parent = ring.transform;
-        hole.transform.localPosition = Vector3.up * 0.025f; // 将球体移动到圆环上方
-        hole.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f); // 调整球体大小
+        hole.transform.localPosition = Vector3.up * 0.025f;  
+        hole.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);  
 
         Renderer ringRenderer = ring.GetComponent<Renderer>();
         ringRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"));
@@ -294,7 +368,7 @@ public class BossEnemyController : EnemyController
 
         Renderer holeRenderer = hole.GetComponent<Renderer>();
         holeRenderer.sharedMaterial = new Material(Shader.Find("Unlit/Color"));
-        holeRenderer.sharedMaterial.color = Color.black; // 使用黑色材质来创建空心效果
+        holeRenderer.sharedMaterial.color = Color.black;  
 
         float maxScale = 3.0f;
         float speed = 5.0f;
@@ -302,7 +376,7 @@ public class BossEnemyController : EnemyController
         while (ring.transform.localScale.x < maxScale)
         {
             ring.transform.localScale += Vector3.one * speed * Time.deltaTime;
-            hole.transform.localScale += Vector3.one * speed * Time.deltaTime; // 同步缩放球体
+            hole.transform.localScale += Vector3.one * speed * Time.deltaTime;  
             yield return null;
         }
 
@@ -323,7 +397,7 @@ public class BossEnemyController : EnemyController
 
     void DrawCircle(float radius)
     {
-        Debug.Log("画圈");
+         
         int segments = 360;
         lineRenderer.positionCount = segments + 1;
         Vector3[] points = new Vector3[segments + 1];
@@ -347,19 +421,28 @@ public class BossEnemyController : EnemyController
         }
     }
 
+    IEnumerator GameStartTimer() {
+        timeSinceGameStarted = 0f;
+        while (timeSinceGameStarted < 5f) {
+            timeSinceGameStarted += Time.deltaTime;
+            yield return null;
+        }
+    }
+    private void CheckDeath() {
+        if (enemyData.CurHealth <= 0) {
+            if (gameObject.tag == "Game" && timeSinceGameStarted < 5f) {
+                enemyData.CurHealth = 3000; // Reset health to 3000 within first 5 seconds
+                return; // Skip the rest of the death logic
+            }
 
-    private void CheckDeath()
-    {
-        if (enemyData.CurHealth <= 0)
-        {
+            // Regular death logic
             GameManager.instance.uiData.EnemyKillNum++;
             PlayerController.instance.GetExp(enemyData.Exp);
             animator.SetTrigger("Die");
-            agent.speed = 0;
             isDead = true;
-            //Destroy(gameObject);
-            //Destroy(healthBar);
-            GameManager.instance.GameOver();
+            // Consider disabling the GameObject instead of destroying it
+            gameObject.SetActive(false); // Disable the GameObject instead of destroying it to avoid errors if references are still held
+            GameManager.instance.GameWin();
         }
     }
 
@@ -369,20 +452,20 @@ public class BossEnemyController : EnemyController
         {
             if ( SkillFunctions.instance.isChargingAttack)
             {
-                Debug.Log("蓄力攻击");
+                 
 
                 GetHitAS.Play();
                 GetDamage(0, 4);
-                Debug.Log("boss掉血");
+                 
                 isGetHit = true;
                 SkillFunctions.instance.isChargingAttack = false;
             }
             else
             {
-                Debug.Log("普通攻击");
+                 
                 GetHitAS.Play();
                 GetDamage();
-                Debug.Log("boss掉血");
+                 
 
                 isGetHit = true;
             }
@@ -390,34 +473,51 @@ public class BossEnemyController : EnemyController
         }
         if (other.tag == "laser"  )
         {
-            Debug.Log("激光攻击");
-            Debug.Log("boss血量: "+enemyData.CurHealth);
+             
+             
 
-            GetHitAS.Play();
+            // GetHitAS.Play();
             GetDamage(0,0.05f);
             isGetHit = true;
+            if (!staticPrefabIsGenerated)
+            {
+                staticPrefab = Instantiate(base.staticPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
+                staticPrefabIsGenerated = true;
+                staticPrefab.transform.localScale = new Vector3(3, 3, 3);
+                isStatic = true;
+                StartCoroutine(RotateAndDestroyObject(staticPrefab, 3f,"isStatic"));
+
+            }
             
-            staticPrefab = Instantiate(base.staticPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
-            staticPrefab.transform.localScale = new Vector3(3, 3, 3);
-            isStatic = true;
+            
     
 
-            StartCoroutine(RotateAndDestroyObject(staticPrefab, 3f,"isStatic"));
         }
         if (other.tag == "bleed"  )
         {
-            Debug.Log("aoe攻击");
-            Debug.Log("boss血量: "+enemyData.CurHealth);
-            GetHitAS.Play();
+             
+             
+            // GetHitAS.Play();
             GetDamage(0,0.1f);
             isGetHit = true;
             
-            bleedPrefab = Instantiate(base.bleedPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
-            bleedPrefab.transform.localScale = new Vector3(3, 3, 3);
-            isBleed = true;
+            // if (bleedPrefab == null)
+            // {
+            //     UnityEngine.Debug.Log("bleedPrefab is not assigned in the Inspector.");
+            //     return;
+            // }
+            if (!bleedPrefabIsGenerated)
+            {
+                bleedPrefab = Instantiate(base.bleedPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
+                bleedPrefabIsGenerated = true;
+                bleedPrefab.transform.localScale = new Vector3(3, 3, 3);
+                isBleed = true;
+                StartCoroutine(RotateAndDestroyObject(bleedPrefab, 3f,"isBleed"));
+
+            }
+           
     
 
-            StartCoroutine(RotateAndDestroyObject(bleedPrefab, 3f,"isBleed"));
 
         }
         if (other.CompareTag("bomb"))
@@ -427,7 +527,7 @@ public class BossEnemyController : EnemyController
             other.gameObject.GetComponent<Rigidbody>().isKinematic = true;  // Disable physics to stick the bomb
 
             StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
-            Debug.Log("Bomb has attached to the enemy.");
+             
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -443,21 +543,21 @@ public class BossEnemyController : EnemyController
             
             if ( SkillFunctions.instance.isChargingAttack)
             {
-                Debug.Log("蓄力攻击");
+                 
 
                 GetHitAS.Play();
                 GetDamage(0, 4);
                 isGetHit = true;
-                Debug.Log("boss掉血");
+                 
 
                 SkillFunctions.instance.isChargingAttack = false;
             }
             else
             {
-                Debug.Log("普通攻击");
-                GetHitAS.Play();
+                 
+                // GetHitAS.Play();
                 GetDamage();
-                Debug.Log("boss掉血");
+                 
 
                 isGetHit = true;
             }
@@ -467,19 +567,31 @@ public class BossEnemyController : EnemyController
         }
         if (other.tag == "laser"  )
         {
-            Debug.Log("激光攻击");
-            Debug.Log("boss血量: "+enemyData.CurHealth);
+             
+             
 
-            GetHitAS.Play();
+            // GetHitAS.Play();
             GetDamage(0,0.05f);
             isGetHit = true;
             
-            staticPrefab = Instantiate(base.staticPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
-            staticPrefab.transform.localScale = new Vector3(3, 3, 3);
-            isStatic = true;
+            if (!staticPrefabIsGenerated)
+            {
+                if (staticPrefab != null)
+                {
+                    staticPrefab = Instantiate(staticPrefab, centerPosition + new Vector3(0, 8, 0), Quaternion.identity);
+                    staticPrefabIsGenerated = true;
+                    staticPrefab.transform.localScale = new Vector3(3, 3, 3);
+                    isStatic = true;
+
+                    StartCoroutine(RotateAndDestroyObject(staticPrefab, 3f, "isStatic"));
+                }
+                else
+                {
+                    // Debug.Log("staticPrefab is not assigned in the Inspector.");
+                }
+            }
     
 
-            StartCoroutine(RotateAndDestroyObject(staticPrefab, 3f,"isStatic"));
         }
         if (other.tag == "sword"  )
         {
@@ -489,18 +601,26 @@ public class BossEnemyController : EnemyController
         }
         if (other.tag == "bleed")
         {
-            Debug.Log("aoe攻击");
-            Debug.Log("boss血量: "+enemyData.CurHealth);
-            GetHitAS.Play();
+             
+             
+            // GetHitAS.Play();
             GetDamage(0,0.1f);
             isGetHit = true;
-            
-            bleedPrefab = Instantiate(base.bleedPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
-            bleedPrefab.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            isBleed = true;
-    
+            // if (bleedPrefab == null)
+            // {
+            //     UnityEngine.Debug.Log("bleedPrefab is not assigned in the Inspector.");
+            //     return;
+            // }
+            if (!bleedPrefabIsGenerated)
+            {
+                bleedPrefab = Instantiate(base.bleedPrefab, centerPosition+new Vector3(0,8,0), Quaternion.identity);
+                bleedPrefabIsGenerated = true;
+                bleedPrefab.transform.localScale = new Vector3(3, 3, 3);
+                isBleed = true;
+                StartCoroutine(RotateAndDestroyObject(bleedPrefab, 3f,"isBleed"));
 
-            StartCoroutine(RotateAndDestroyObject(bleedPrefab, 3f,"isBleed"));
+            }
+
         }
         if (other.CompareTag("bomb"))
         {
@@ -509,7 +629,7 @@ public class BossEnemyController : EnemyController
             other.gameObject.GetComponent<Rigidbody>().isKinematic = true;  // Disable physics to stick the bomb
 
             StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
-            Debug.Log("Bomb has attached to the enemy.");
+             
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -522,10 +642,12 @@ public class BossEnemyController : EnemyController
         yield return new WaitForSeconds(delay);  // Wait for the specified delay
         Destroy(bomb);  // Destroy the bomb object
         GetDamage(0,0.2f);
-        Debug.Log("Bomb has been destroyed after " + delay + " seconds.");
+         
     }
     private GameObject staticPrefab;
+    private bool staticPrefabIsGenerated=false;
     private GameObject bleedPrefab;
+    private bool bleedPrefabIsGenerated=false;
     private bool isStatic = false;
     private bool isBleed = false;
     IEnumerator RotateAndDestroyObject(GameObject obj, float duration,string stateName)
@@ -533,22 +655,27 @@ public class BossEnemyController : EnemyController
         float time = 0;
         while (time < duration)
         {
-            // 每帧旋转一定角度
-            obj.transform.Rotate(new Vector3(0, 90, 0) * Time.deltaTime); // 调整旋转速度和轴向
+            if (obj == null) 
+            {
+                // If the object has been destroyed, exit the coroutine
+                yield break;
+            }
+            obj.transform.Rotate(new Vector3(0, 90, 0) * Time.deltaTime);  
             time += Time.deltaTime;
             yield return null;
         }
 
         if (stateName=="isState")
         {
+            staticPrefabIsGenerated = false;
             isStatic = false;
         }else if (stateName=="isBleed")
         {
+            bleedPrefabIsGenerated = false;
             isBleed = false;
         }
-        
 
-        // 摧毁对象
+       
         Destroy(obj);
     }
     
@@ -561,12 +688,12 @@ public class BossEnemyController : EnemyController
             {
                 if (PlayerController.instance.isCritical)
                 {
-                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* 2);
+                     
                     enemyData.CurHealth -= PlayerController.instance.playerData.Attack * 2;
                 }
                 else
                 {
-                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack);
+                     
 
                     enemyData.CurHealth -= PlayerController.instance.playerData.Attack;
                 }
@@ -574,14 +701,14 @@ public class BossEnemyController : EnemyController
 
             if (damage != null && damage > 0)
             {
-                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack+ damage);
+                 
 
                 enemyData.CurHealth -= PlayerController.instance.playerData.Attack + damage;
             }
 
             if (rate != null && rate > 0)
             {
-                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* rate);
+                 
 
                 enemyData.CurHealth -= PlayerController.instance.playerData.Attack * rate;
             }

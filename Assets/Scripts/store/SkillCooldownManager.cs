@@ -24,29 +24,24 @@ public class SkillCooldownManager
         }
         else
         {
-            return 0f; // 如果找不到技能名称，则返回默认值
+            return 0f;  
         }
     }
 }
 
-// 在其他地方使用示例：
 public class ExampleUsage
 {
     private SkillCooldownManager cooldownManager = new SkillCooldownManager();
 
     void Start()
     {
-        // 设置技能冷却时间
         cooldownManager.SetCooldown("Shield awarded", 10f);
         cooldownManager.SetCooldown("Fireball", 15f);
-        // 其他技能...
     }
 
     void Update()
     {
-        // 获取技能冷却时间并进行逻辑处理
         float shieldCooldown = cooldownManager.GetCooldown("Shield awarded");
         float fireballCooldown = cooldownManager.GetCooldown("Fireball");
-        // 其他技能...
     }
 }

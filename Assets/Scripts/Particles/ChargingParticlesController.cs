@@ -4,13 +4,13 @@ using UnityEngine;
 public class ChargingParticlesController : MonoBehaviour
 {
     public static ChargingParticlesController instance;
-    public GameObject player; // 玩家对象
-    public float radius = 2f; // 环绕半径
-    public int numberOfParticles = 50; // 粒子数量
-    public float particleSpeed = 0.5f; // 粒子移动速度
-    public ParticleSystem chargingParticlesPrefab; // 充能粒子预制体
+    public GameObject player;  
+    public float radius = 2f;  
+    public int numberOfParticles = 50; 
+    public float particleSpeed = 0.5f; 
+    public ParticleSystem chargingParticlesPrefab;  
 
-    private ParticleSystem[] chargingParticles; // 充能粒子数组
+    private ParticleSystem[] chargingParticles;  
     public bool isStart = false;
 
     private void Awake()
@@ -22,8 +22,7 @@ public class ChargingParticlesController : MonoBehaviour
     {
         if (isStart)
         {
-            // 实例化充能粒子并设置位置、速度等属性
-            chargingParticles = new ParticleSystem[numberOfParticles]; // 初始化充能粒子数组
+            chargingParticles = new ParticleSystem[numberOfParticles]; 
             for (int i = 0; i < numberOfParticles; i++)
             {
                 chargingParticles[i] = Instantiate(chargingParticlesPrefab, transform.position, Quaternion.identity);
@@ -41,7 +40,6 @@ public class ChargingParticlesController : MonoBehaviour
     {
         if (isStart)
         {
-            // 更新充能粒子位置
             UpdateParticlePositions();
         }
     }
@@ -49,7 +47,6 @@ public class ChargingParticlesController : MonoBehaviour
     public void PlayParticles()
     {
         isStart = true;
-        // 启动所有充能粒子
         if (chargingParticles != null)
         {
             foreach (ParticleSystem particle in chargingParticles)
@@ -65,7 +62,6 @@ public class ChargingParticlesController : MonoBehaviour
     public void destory()
     {
         isStart = false;
-        // 启动所有充能粒子
         if (chargingParticles != null)
         {
             foreach (ParticleSystem particle in chargingParticles)
@@ -81,20 +77,19 @@ public class ChargingParticlesController : MonoBehaviour
 
     void UpdateParticlePositions()
     {
-        // 更新所有充能粒子的位置，形成一个圆形排列
         for (int i = 0; i < numberOfParticles; i++)
         {
-            float angle = i * 2 * Mathf.PI / numberOfParticles; // 计算角度，确保粒子均匀分布在圆周上
-            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius; // 计算粒子位置偏移量
-            Vector3 targetPosition = player.transform.position + offset; // 计算粒子目标位置
+            float angle = i * 2 * Mathf.PI / numberOfParticles;  
+            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * radius;  
+            Vector3 targetPosition = player.transform.position + offset;  
             if (chargingParticles != null)
             {
                 if (chargingParticles[i].transform != null)
                 {
                     chargingParticles[i].transform.position = Vector3.MoveTowards(
                         chargingParticles[i].transform.position, targetPosition,
-                        particleSpeed * Time.deltaTime); // 将粒子移动到目标位置
-                    chargingParticles[i].transform.LookAt(player.transform); // 使粒子朝向玩家
+                        particleSpeed * Time.deltaTime);  
+                    chargingParticles[i].transform.LookAt(player.transform);  
                 }
             }
         }

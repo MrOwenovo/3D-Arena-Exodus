@@ -14,11 +14,17 @@ public class EnemyGenerator : MonoBehaviour
     public GameObject EnemyParentTemplate;
     public GameObject EnemyParentTraining;
 
+    
+    public void destroyParent()
+    {
+        Destroy(EnemyParent);
+
+    }
     private void Awake()
     {
         instance = this;
     }
-    // Start is called before the first frame update
+    // Start is called before the first frame update 
    
     public void DeployEnemies(int skillLevel, Vector3 bossPosition)
     {
@@ -109,7 +115,7 @@ public class EnemyGenerator : MonoBehaviour
     EnemyData turtleData = new EnemyData();
     turtleData.MaxHealth = 3000;
     turtleData.CurHealth = turtleData.MaxHealth;
-    turtleData.Attack = 20;
+    turtleData.Attack = 5;
     turtleData.Exp = 35;
 
     temp.GetComponent<EnemyController>().enemyData = turtleData;
@@ -139,7 +145,7 @@ EnemyData DefaultBoxData(Vector3 startPoint, Vector3 endPoint)
     EnemyData boxData = new EnemyData();
     boxData.MaxHealth = 200;
     boxData.CurHealth = boxData.MaxHealth;
-    boxData.Attack = 20;
+    boxData.Attack = 10;
     boxData.Exp = 60;
 
     temp.GetComponent<EnemyController>().enemyData = boxData;

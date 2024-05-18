@@ -19,10 +19,10 @@ public class SkillFunctions : MonoBehaviour
     public ParticleSystem laserParticles;
     public bool startCharging=false;
     
-    public float laserDuration = 1f; // 激光持续时间
-    public float laserDamage = 10f; // 激光伤害
+    public float laserDuration = 1f;  
+    public float laserDamage = 10f;  
 
-    private bool isFiring = false; // 是否正在发射激光
+    private bool isFiring = false;  
     private float currentDuration = 0f;
     
     public static SkillFunctions instance;
@@ -64,7 +64,7 @@ public class SkillFunctions : MonoBehaviour
     }
     void UpdateChargeProgress()
     {
-        Debug.Log("更新chargePrograss");
+         
         chargeProgress += Time.deltaTime;
         // Adjust particle emission rate based on charge progress
         var emission = chargingParticles.emission;
@@ -74,7 +74,7 @@ public class SkillFunctions : MonoBehaviour
     // Method to start charging when the left mouse button is pressed
     public void StartCharging()
     {
-        Debug.Log("开始蓄力");
+         
         isChargingAttack = false;
         isCharging = true;
       
@@ -88,7 +88,7 @@ public class SkillFunctions : MonoBehaviour
         isCharging = false;
        
         // Release the attack with appropriate effects based on charge progress
-        Debug.Log("Charged attack released with progress: " + chargeProgress);
+         
         if (chargeProgress > 1)
         {
         int att_value = Random.Range(0, 100);
@@ -126,7 +126,7 @@ public class SkillFunctions : MonoBehaviour
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
             {
                 StartCharging();
-                Debug.Log("使用技能: " + currentSkill.name);
+                 
                 PlayerController.instance.skillCanAttack[currentSkill.name] = false;
                 int att_value = Random.Range(0, 100);
                 PlayerController.instance.WeaponAS.Play();
@@ -158,31 +158,28 @@ public class SkillFunctions : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
             {
-                if (PlayerController.instance.curSP >= 50) // 检查是否有足够的法力值
+                if (PlayerController.instance.curSP >= 50)  
                 {
-                    // 扣除法力值
                     PlayerController.instance.curSP -= 50;
 
-                    // 给玩家套上护盾
                     PlayerController.instance.playerData.ShieldValue = 50;
-                    Debug.Log("增加护盾，护盾值: "+PlayerController.instance.playerData.ShieldValue);
+                     
                     // UIManager.instance.shield.text = PlayerController.instance.playerData.ShieldValue.ToString();
                     UIManager.instance.Sheildbar.fillAmount = PlayerController.instance.playerData.ShieldValue / 50;
                     UIManager.instance.ShieldValue.text = PlayerController.instance.playerData.ShieldValue.ToString()+ " / " + 50;
-                    // 生成环绕用户的特效
                     if (shieldParticles != null)
                     {
                         shieldParticles.Play();
                         ChargingParticlesController.instance.PlayParticles();
                     }
                     
-                    Debug.Log("使用技能: " + currentSkill.name);
+                     
                    
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
                 }
                 else
                 {
-                    Debug.Log("法力值不足，无法释放护盾技能。");
+                     
                 }
             }
         }
@@ -190,26 +187,23 @@ public class SkillFunctions : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
             {
-                if (PlayerController.instance.curSP >= 70) // 检查是否有足够的法力值
+                if (PlayerController.instance.curSP >= 70)  
                 {
-                    // 扣除法力值
                     PlayerController.instance.curSP -= 70;
 
-                    // 给玩家套上护盾
                     PlayerController.instance.playerData.MaxHealth +=20;
                     PlayerController.instance.playerData.max_health +=20;
                     PlayerController.instance.playerData.current_health +=20;
-                    Debug.Log("增加血量，血量值: "+ PlayerController.instance.playerData.MaxHealth);
+                     
                     // UIManager.instance.Sheildbar.fillAmount = PlayerController.instance.playerData.ShieldValue / 50;
                     // UIManager.instance.ShieldValue.text = PlayerController.instance.playerData.ShieldValue.ToString()+ " / " + 50;
-                    // 生成环绕用户的特效
-                    Debug.Log("使用技能: " + currentSkill.name);
+                     
                    
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
                 }
                 else
                 {
-                    Debug.Log("法力值不足，无法释放护盾技能。");
+                     
                 }
             }
         }
@@ -217,24 +211,21 @@ public class SkillFunctions : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
             {
-                if (PlayerController.instance.curSP >= 40) // 检查是否有足够的法力值
+                if (PlayerController.instance.curSP >= 40)  
                 {
-                    // 扣除法力值
                     PlayerController.instance.curSP -= 40;
 
-                    // 给玩家套上护盾
                     PlayerController.instance.playerData.attack +=50;
-                    Debug.Log("增加攻击，攻击值: "+ PlayerController.instance.playerData.attack);
+                     
                     // UIManager.instance.Sheildbar.fillAmount = PlayerController.instance.playerData.ShieldValue / 50;
                     // UIManager.instance.ShieldValue.text = PlayerController.instance.playerData.ShieldValue.ToString()+ " / " + 50;
-                    // 生成环绕用户的特效
-                    Debug.Log("使用技能: " + currentSkill.name);
+                     
                    
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
                 }
                 else
                 {
-                    Debug.Log("法力值不足，无法释放攻击                                                      技能。");
+                     
                 }
             }
         } 
@@ -242,14 +233,12 @@ public class SkillFunctions : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
 {
-    if (PlayerController.instance.curSP >= 40) // 检查是否有足够的法力值
+    if (PlayerController.instance.curSP >= 40) 
     {
-        // 扣除法力值
         PlayerController.instance.curSP -= 40;
-        Debug.Log("使用技能: " + currentSkill.name);
+         
         PlayerController.instance.skillCanAttack[currentSkill.name] = false;
 
-        // 发射射线，获取鼠标点击的位置
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
         if (Physics.Raycast(ray, out hit, 100f, PlayerController.instance.GroundLayer))
@@ -257,12 +246,10 @@ public class SkillFunctions : MonoBehaviour
             Vector3 targetPosition = hit.point + new Vector3(0, 0.3f, 0);
             Vector3 direction = targetPosition - PlayerController.instance.transform.position;
 
-            // 实例化激光预制体并设置位置和方向
             GameObject laser = Instantiate(PlayerController.instance.laserPrefab, PlayerController.instance.transform.position + new Vector3(5, 5, 5), Quaternion.identity);
             laser.transform.localScale = new Vector3(4, 4, 4);
             laser.transform.LookAt(targetPosition);
 
-            // 获取激光预制体上的 LineRenderer 组件
             LineRenderer lineRenderer = laser.GetComponent<LineRenderer>();
             if (lineRenderer != null)
             {
@@ -273,19 +260,19 @@ public class SkillFunctions : MonoBehaviour
 
             else
             {
-                Debug.Log("没有射击到任何目标");
+                 
             }
 
-            Destroy(laser, 1.0f); // 1秒后销毁激光
+            Destroy(laser, 1.0f);  
         }
         else
         {
-            Debug.Log("没有点击到地面");
+             
         }
     }
     else
     {
-        Debug.Log("法力值不足，无法释放攻击技能。");
+         
     }
 }
         }
@@ -293,32 +280,28 @@ public class SkillFunctions : MonoBehaviour
         {
             if (Input.GetMouseButtonDown(0) && PlayerController.instance.skillCanAttack[currentSkill.name])
             {
-                if (PlayerController.instance.curSP >= 40) // 检查是否有足够的法力值
+                if (PlayerController.instance.curSP >= 40)  
                 {
-                    // 扣除法力值
                     PlayerController.instance.curSP -= 40;
-                    Debug.Log("使用技能: " + currentSkill.name);
+                     
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
 
-                    // 发射射线，获取鼠标点击的位置
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                     RaycastHit hit;
                     if (Physics.Raycast(ray, out hit, 100f, PlayerController.instance.GroundLayer))
                     {
-                        // 实例化bleed预制体并设置位置
                         GameObject bleedEffect = Instantiate(PlayerController.instance.bleedPrefab, hit.point + Vector3.down * 5f, Quaternion.identity);
 
-                        // 开始协程来控制动画和消失
                         StartCoroutine(AnimateBleedEffect(bleedEffect));
                     }
                     else
                     {
-                        Debug.Log("没有点击到地面");
+                         
                     }
                 }
                 else
                 {
-                    Debug.Log("法力值不足，无法释放攻击技能。");
+                     
                 }
             }
         }
@@ -331,7 +314,7 @@ public class SkillFunctions : MonoBehaviour
                 {
                     // Deduct mana
                     PlayerController.instance.curSP -= 40;
-                    Debug.Log("Using skill: " + currentSkill.name);
+                     
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
 
                     // Cast a ray from the camera to the mouse position
@@ -347,16 +330,16 @@ public class SkillFunctions : MonoBehaviour
                             new Vector3(0, 0.3f, 0); // Adjust the position slightly above the ground
 
 
-                        Debug.Log("Bomb placed at: " + hit.point);
+                         
                     }
                     else
                     {
-                        Debug.Log("No ground clicked, cannot place bomb.");
+                         
                     }
                 }
                 else
                 {
-                    Debug.Log("Insufficient mana to cast skill.");
+                     
                 }
             }
         }
@@ -368,7 +351,7 @@ public class SkillFunctions : MonoBehaviour
                 if (PlayerController.instance.curSP >= 40) // Check if there's enough mana
                 {
                     PlayerController.instance.curSP -= 40; // Deduct mana
-                    Debug.Log("Using skill: " + currentSkill.name);
+                     
                     PlayerController.instance.skillCanAttack[currentSkill.name] = false;
 
                     // Cast a ray from the camera to the mouse position to determine the direction
@@ -409,19 +392,19 @@ public class SkillFunctions : MonoBehaviour
                 }
                 else
                 {
-                    Debug.Log("Insufficient mana to cast the skill.");
+                     
                 }
             }
 
         }
     }
     public List<GameObject> bombs = new List<GameObject>();
-    IEnumerator AnimateBleedEffect(GameObject bleedEffect)
+
+    public IEnumerator AnimateBleedEffect(GameObject bleedEffect)
     {
         float elapsedTime = 0f;
-        float duration = 1f; // 动画持续时间
+        float duration = 1f;  
 
-        // 慢慢上升到地面
         while (elapsedTime < duration)
         {
             bleedEffect.transform.position = Vector3.Lerp(bleedEffect.transform.position+ Vector3.up * 0.15f, bleedEffect.transform.position + Vector3.up * 0.055f, elapsedTime / duration);
@@ -429,10 +412,9 @@ public class SkillFunctions : MonoBehaviour
             yield return null;
         }
 
-        // 确保最终位置精确
         bleedEffect.transform.position = bleedEffect.transform.position + Vector3.up * 0.1f;
 
-        // 延迟销毁
+  
         yield return new WaitForSeconds(0.6f);
         Destroy(bleedEffect);
     }
@@ -456,8 +438,8 @@ public class SkillFunctions : MonoBehaviour
         // PlayerController.instance.SetSkillCooldown(currentSkillName, 0);
 
         SkillUI.instance.skillContainers[PlayerController.instance.selectedSkillIndex].transform
-            .Find("skillPanel(Clone)/SkillImage/cover").GetComponent<Image>().fillAmount = 0; // 完全填充表示冷却完成
-        Debug.Log("!END:  "+currentSkillName);
+            .Find("skillPanel(Clone)/SkillImage/cover").GetComponent<Image>().fillAmount = 0; 
+         
         PlayerController.instance.skillCanAttackIsStart[currentSkillName]= false;
 
 

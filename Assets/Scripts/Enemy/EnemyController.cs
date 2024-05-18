@@ -40,60 +40,92 @@ public class EnemyController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+   void Update()
+{
+    if (GameManager.instance != null && GameManager.instance.curStatus == Status.Game && !isDead)
     {
-        if (GameManager.instance.curStatus == Status.Game && !isDead)
+        if (healthBar != null && BarPoint != null && main_cam != null)
         {
-            if (healthBar != null)
-            {
-                healthBar.transform.position = BarPoint.position;
-                healthBar.transform.LookAt(main_cam.position);
-            }
+            healthBar.transform.position = BarPoint.position;
+            healthBar.transform.LookAt(main_cam.position);
+        }
+        else
+        {
+            Debug.LogWarning("healthBar, BarPoint, or main_cam is not assigned.");
+        }
 
-            if (!PlayerController.instance.isAttacking)
-            {
-                isGetHit = false;
-            }
+        if (PlayerController.instance != null && !PlayerController.instance.isAttacking)
+        {
+            isGetHit = false;
+        }
 
-            if (gameObject.GetComponent<NavMeshAgent>() == null)
-            {
-                gameObject.AddComponent<NavMeshAgent>();
-            }
+        if (gameObject.GetComponent<NavMeshAgent>() == null)
+        {
+            gameObject.AddComponent<NavMeshAgent>();
+        }
 
-            agent = gameObject.GetComponent<NavMeshAgent>();
+        agent = gameObject.GetComponent<NavMeshAgent>();
+        if (agent != null)
+        {
             if (agent.isOnNavMesh)
             {
-                agent.SetDestination(GameManager.instance.Player.transform.position);
+                if (GameManager.instance.Player != null)
+                {
+                    agent.SetDestination(GameManager.instance.Player.transform.position);
+                }
+                else
+                {
+                    Debug.LogWarning("GameManager.instance.Player is not assigned.");
+                }
             }
             else
             {
                 agent.Warp(transform.position);
             }
-
-            // speed up
-            timer += Time.deltaTime;
-            if (timer > 6)
-            {
-                agent.speed += 0.5f;
-                animator.SetFloat("Run", agent.speed);
-                timer = 0;
-            }
-
-            CheckDeath();
-            healthBar.transform.GetChild(0).GetComponent<Image>().fillAmount =
-                enemyData.CurHealth / enemyData.MaxHealth;
-            enemyData.Location = transform.position;
         }
-        else if (isDead)
+        else
         {
-            deadTimer += Time.deltaTime;
-            if (deadTimer > 1)
+            Debug.LogWarning("NavMeshAgent component is missing.");
+        }
+
+        timer += Time.deltaTime;
+        if (timer > 6)
+        {
+            agent.speed += 0.5f;
+            if (animator != null)
             {
-                Destroy(gameObject);
+                animator.SetFloat("Run", agent.speed);
+            }
+            timer = 0;
+        }
+
+        CheckDeath();
+
+        if (healthBar != null)
+        {
+            var healthImage = healthBar.transform.GetChild(0).GetComponent<Image>();
+            if (healthImage != null)
+            {
+                healthImage.fillAmount = enemyData.CurHealth / enemyData.MaxHealth;
+            }
+        }
+
+        enemyData.Location = transform.position;
+    }
+    else if (isDead)
+    {
+        deadTimer += Time.deltaTime;
+        if (deadTimer > 1)
+        {
+            Destroy(gameObject);
+            if (healthBar != null)
+            {
                 Destroy(healthBar);
             }
         }
     }
+}
+
 
     private void CheckDeath()
     {
@@ -110,8 +142,8 @@ public class EnemyController : MonoBehaviour
     }
     public void TakeDamage(int damage)
     {
-        Debug.Log("受到了+"+damage);
-        Debug.Log("蓄力攻击");
+         
+         ;
 
         GetHitAS.Play();
         GetDamage(damage);
@@ -123,7 +155,7 @@ public class EnemyController : MonoBehaviour
         {
             if ( SkillFunctions.instance.isChargingAttack)
             {
-                Debug.Log("蓄力攻击");
+                 ;
 
                 GetHitAS.Play();
                 GetDamage(0, 4);
@@ -132,7 +164,7 @@ public class EnemyController : MonoBehaviour
             }
             else
             {
-                Debug.Log("普通攻击");
+                 ;
                 GetHitAS.Play();
                 GetDamage();
                 isGetHit = true;
@@ -141,7 +173,7 @@ public class EnemyController : MonoBehaviour
         }
         if (other.tag == "laser")
         {
-            Debug.Log("激光攻击");
+             ;
 
             GetHitAS.Play();
             GetDamage(0, 4);
@@ -168,7 +200,7 @@ public class EnemyController : MonoBehaviour
 
 
             StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
-            Debug.Log("Bomb has attached to the enemy.");
+             ;
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -184,7 +216,7 @@ public class EnemyController : MonoBehaviour
             
             if ( SkillFunctions.instance.isChargingAttack)
             {
-                Debug.Log("蓄力攻击");
+                 ;
 
                 GetHitAS.Play();
                 GetDamage(0, 4);
@@ -193,7 +225,7 @@ public class EnemyController : MonoBehaviour
             }
             else
             {
-                Debug.Log("普通攻击");
+                 ;
                 GetHitAS.Play();
                 GetDamage();
                 isGetHit = true;
@@ -205,7 +237,7 @@ public class EnemyController : MonoBehaviour
         
         if (other.tag == "laser"  )
         {
-            Debug.Log("激光攻击");
+             ;
 
             GetHitAS.Play();
             GetDamage();
@@ -232,7 +264,7 @@ public class EnemyController : MonoBehaviour
 
 
             StartCoroutine(DestroyBombAfterDelay(other.gameObject, 3.0f));  // Start the coroutine to destroy the bomb after 3 seconds
-            Debug.Log("Bomb has attached to the enemy.");
+             ;
         }
         if (!PlayerController.instance.isInvincible && other.tag == "Player")
         {
@@ -246,7 +278,7 @@ public class EnemyController : MonoBehaviour
         yield return new WaitForSeconds(delay);  // Wait for the specified delay
         Destroy(bomb);  // Destroy the bomb object
         GetDamage(0,4);
-        Debug.Log("Bomb has been destroyed after " + delay + " seconds.");
+         ;
     }
 
 
@@ -258,12 +290,12 @@ public class EnemyController : MonoBehaviour
             {
                 if (PlayerController.instance.isCritical)
                 {
-                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* 2);
+                     
                     enemyData.CurHealth -= PlayerController.instance.playerData.Attack * 2;
                 }
                 else
                 {
-                    Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack);
+                     
 
                     enemyData.CurHealth -= PlayerController.instance.playerData.Attack;
                 }
@@ -271,14 +303,14 @@ public class EnemyController : MonoBehaviour
 
             if (damage != null && damage > 0)
             {
-                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack+ damage);
+                 
 
                 enemyData.CurHealth -= PlayerController.instance.playerData.Attack + damage;
             }
 
             if (rate != null && rate > 0)
             {
-                Debug.Log("攻击力: "+PlayerController.instance.playerData.Attack* rate);
+                 
 
                 enemyData.CurHealth -= PlayerController.instance.playerData.Attack * rate;
             }

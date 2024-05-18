@@ -59,15 +59,13 @@ public class UIManager : MonoBehaviour
     }
     void ConfigureParticleEffect(ParticleSystem ps)
     {
-        // 停止粒子系统并清除现有粒子，确保可以安全修改配置
         ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
 
-        // 配置粒子系统
         ParticleSystem.MainModule main = ps.main;
         main.startColor = Color.yellow;
         main.startSize = 0.2f;
         main.startLifetime = 1.0f;
-        main.duration = 1.0f;  // 现在可以安全地设置持续时间
+        main.duration = 1.0f;   
         main.loop = false;
 
         ParticleSystem.EmissionModule emission = ps.emission;
@@ -80,7 +78,6 @@ public class UIManager : MonoBehaviour
         shape.shapeType = ParticleSystemShapeType.Sphere;
         shape.radius = 0.5f;
 
-        // 重新开始播放粒子系统
         ps.Play();
     }
 

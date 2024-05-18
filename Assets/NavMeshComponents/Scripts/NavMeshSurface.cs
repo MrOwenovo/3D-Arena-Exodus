@@ -169,7 +169,7 @@ namespace UnityEngine.AI
             }
 
             var data = NavMeshBuilder.BuildNavMeshData(GetBuildSettings(),
-                    sources, sourcesBounds, transform.position, transform.rotation);
+                sources, sourcesBounds, transform.position, transform.rotation);
 
             if (data != null)
             {
@@ -178,6 +178,10 @@ namespace UnityEngine.AI
                 m_NavMeshData = data;
                 if (isActiveAndEnabled)
                     AddData();
+            }
+            else
+            {
+                Debug.Log("NavMesh build failed. Ensure all meshes have Read/Write Enabled.");
             }
         }
 

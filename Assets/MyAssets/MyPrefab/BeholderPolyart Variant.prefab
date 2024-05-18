@@ -43,6 +43,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 4448579059374607027, guid: c56fbcba1d0ff334e8a54ad505ffd54c, type: 3}
+      propertyPath: bleedPrefab
+      value: 
+      objectReference: {fileID: 3021877135130851492, guid: 9f340188660d88a49983d91a4ae19c0a, type: 3}
+    - target: {fileID: 4448579059374607027, guid: c56fbcba1d0ff334e8a54ad505ffd54c, type: 3}
+      propertyPath: staticPrefab
+      value: 
+      objectReference: {fileID: 6950423379102812, guid: 6fa139b8f6ebef948948f21b825b6806, type: 3}
     - target: {fileID: 4796426612172891261, guid: c56fbcba1d0ff334e8a54ad505ffd54c, type: 3}
       propertyPath: m_RootOrder
       value: 0

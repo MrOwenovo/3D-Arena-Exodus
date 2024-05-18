@@ -191,6 +191,118 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void DestroyAllObjectsWithName(string objectName)
+    {
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name == objectName)
+            {
+                Destroy(obj);
+            }
+        }
+    }
+    // private IEnumerator DelayedLoadContainerState(float delay)
+    // {
+    //     // yield return new WaitForSeconds(delay);
+    //     SkillUI.instance.LoadContainerState();
+    // }
+
+  public void BackToMenu()
+{
+    if (SkillUI.instance != null)
+    {
+        if (SkillUI.instance.trainingSkillName != null && SkillUI.instance.trainingSkillName.Count > 0 && SkillUI.instance.trainingSkillName[0] != null)
+        {
+            SkillUI.instance.trainingSkillName = new List<string>(4);
+        }
+    }
+
+  
+    
+    DestroyAllObjectsWithName("skillPanel(Clone)");
+
+    // Start coroutine to delay LoadContainerState
+    // StartCoroutine(DelayedLoadContainerState(1f)); // 1 second delay, adjust as needed
+    // yield return new WaitForSeconds(delay);
+    SkillUI.instance.LoadContainerState();
+
+    // if (SkillUI.instance != null)
+    // {
+    //     SkillUI.instance.LoadContainerState();
+    // }
+
+    if (PlayerController.instance != null)
+    {
+        PlayerController.instance.DelayedUpdateEquippedSkills(1f);
+    }
+
+    DestroyAllObjectsWithName("Sword Variant(Clone)");
+    DestroyAllObjectsWithName("PolygonPowerupShield(Clone)");
+    DestroyAllObjectsWithName("PolygonPowerupSpeed(Clone)");
+    DestroyAllObjectsWithName("PolyBoneRibCageGory Variant(Clone)");
+    DestroyAllObjectsWithName("Shockwave");
+
+    if (EnemyGenerator.instance != null && EnemyGenerator.instance.EnemyParent != null && GameManager.instance.frontStatus == Status.Game)
+    {
+        EnemyGenerator.instance.destroyParent();
+    }
+
+    if (GameManager.instance != null)
+    {
+        GameManager.instance.openSkills.gameObject.SetActive(false);
+        GameManager.instance.SwitchGameStatus(Status.Menu);
+    }
+
+    if (AudioManager.instance != null)
+    {
+        AudioManager.instance.SwitchBGM(-1);
+    }
+
+    StopAllCoroutines();
+    Time.timeScale = 1;
+
+    if (GameManager.instance != null && GameManager.instance.Player != null)
+    {
+        Destroy(GameManager.instance.Player);
+    }
+
+    if (BossControllerTraining.instance != null && BossControllerTraining.instance.temp != null)
+    {
+        Destroy(BossControllerTraining.instance.temp);
+    }
+
+    if (UIManager.instance != null)
+    {
+        Transform enemyBars = UIManager.instance.enemyBarsUI.transform;
+        for (int i = 0; i < enemyBars.childCount; i++)
+        {
+            Destroy(enemyBars.GetChild(i).gameObject);
+        }
+
+        SkillUI.instance.SetActiveRecursively(SkillUI.instance.storePanel, false);
+    }
+
+    if (ObstacleGenerator.instance != null)
+    {
+        ObstacleGenerator.instance.mapOccupied = new bool[ObstacleGenerator.instance.mapSize, ObstacleGenerator.instance.mapSize];
+        foreach (GameObject obstacle in ObstacleGenerator.instance.generatedObstacles)
+        {
+            if (obstacle != null)
+            {
+                Destroy(obstacle);
+            }
+        }
+        ObstacleGenerator.instance.generatedObstacles.Clear();
+    }
+
+    if (SkillCoinManager.instance != null && SkillCoinManager.instance.currentSkillCoin != null)
+    {
+        Destroy(SkillCoinManager.instance.currentSkillCoin);
+    }
+}
+
+
     // Generate the player
     void GeneratePlayer()
     {
@@ -221,6 +333,7 @@ public class GameManager : MonoBehaviour
     }
     void Start()
     {
+       
         experienceToNextLevel = new float[100];
         for(int i = 0; i < 100; i++)
         {
@@ -235,7 +348,7 @@ public class GameManager : MonoBehaviour
     {
         if(Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("按下！！！！！！！！！！sakjdas");
+             ;
             PauseGame();
         }
         if(curStatus == Status.Game)
@@ -264,7 +377,7 @@ public class GameManager : MonoBehaviour
     }
 
     
-
+//1
     private float BezierCurve(float t)
     {
         Vector2 subA = Vector2.Lerp(startPoint, controlPoint, t);
@@ -274,6 +387,84 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+      
+
+        SkillUI.instance.onceLoadData = null;
+        ObstacleGenerator.instance.isObstaclesGenerated = false;
+        for (int i = 0; i < 4; i++)
+        {
+            if (SkillUI.instance != null && SkillUI.instance.skillContainers != null && i < SkillUI.instance.skillContainers.Length)
+            {
+                GameObject skillContainer = SkillUI.instance.skillContainers[i];
+                if (skillContainer != null)
+                {
+                    Transform imageTransform = skillContainer.transform.Find("skillPanel(Clone)/SkillImage/Image");
+                    if (imageTransform != null)
+                    {
+                        GameObject imageGameObject = imageTransform.gameObject;
+                        imageGameObject.SetActive(false); // Activate GameObject
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Image transform not found in skill container {i}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Skill container {i} is null");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"SkillUI.instance or skillContainers is null, or index {i} is out of bounds");
+            }
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (SkillUI.instance != null && SkillUI.instance.skillContainers != null &&
+                i < SkillUI.instance.skillContainers.Length)
+            {
+                GameObject skillContainer = SkillUI.instance.skillContainers[i];
+                if (skillContainer != null)
+                {
+                    Transform skillPanelTransform = skillContainer.transform.Find("skillPanel(Clone)/SkillImage/cover");
+                    if (skillPanelTransform != null)
+                    {
+                        Image coverImage = skillPanelTransform.GetComponent<Image>();
+                        if (coverImage != null)
+                        {
+                            coverImage.fillAmount = 0;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Cover image component not found in skill container {i}");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Skill panel transform not found in skill container {i}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Skill container {i} is null");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"SkillUI.instance or skillContainers is null, or index {i} is out of bounds");
+            }
+        }
+        if (BossEnemyController.instance!=null)
+        {
+            BossEnemyController.instance.bleedPrefab.gameObject.SetActive(true);
+        }
+
+        if (BossEnemyController.instance != null)
+        {
+            BossEnemyController.instance.staticPrefab.gameObject.SetActive(true);
+        }
+        frontStatus = Status.Game;
         isNewGame = true;
         EnemyGenerator.instance.EnemyParent = new GameObject("EnemyParent");
         Time.timeScale = 1;
@@ -299,6 +490,84 @@ public class GameManager : MonoBehaviour
     }
     public void StartTrainingGame()
     {
+        SkillUI.instance.onceLoadData = null;
+
+        BossControllerTraining.instance.isBossGenerated = false;
+        for (int i = 0; i < 4; i++)
+        {
+            if (SkillUI.instance != null && SkillUI.instance.skillContainers != null && i < SkillUI.instance.skillContainers.Length)
+            {
+                GameObject skillContainer = SkillUI.instance.skillContainers[i];
+                if (skillContainer != null)
+                {
+                    Transform imageTransform = skillContainer.transform.Find("skillPanel(Clone)/SkillImage/Image");
+                    if (imageTransform != null)
+                    {
+                        GameObject imageGameObject = imageTransform.gameObject;
+                        imageGameObject.SetActive(false); // Activate GameObject
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Image transform not found in skill container {i}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Skill container {i} is null");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"SkillUI.instance or skillContainers is null, or index {i} is out of bounds");
+            }
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (SkillUI.instance != null && SkillUI.instance.skillContainers != null &&
+                i < SkillUI.instance.skillContainers.Length)
+            {
+                GameObject skillContainer = SkillUI.instance.skillContainers[i];
+                if (skillContainer != null)
+                {
+                    Transform skillPanelTransform = skillContainer.transform.Find("skillPanel(Clone)/SkillImage/cover");
+                    if (skillPanelTransform != null)
+                    {
+                        Image coverImage = skillPanelTransform.GetComponent<Image>();
+                        if (coverImage != null)
+                        {
+                            coverImage.fillAmount = 0;
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"Cover image component not found in skill container {i}");
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Skill panel transform not found in skill container {i}");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning($"Skill container {i} is null");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"SkillUI.instance or skillContainers is null, or index {i} is out of bounds");
+            }
+        }
+
+        if (BossEnemyController.instance!=null)
+        {
+            BossEnemyController.instance.bleedPrefab.gameObject.SetActive(true);
+        }
+        
+        if (BossEnemyController.instance != null)
+        {
+            BossEnemyController.instance.staticPrefab.gameObject.SetActive(true);
+        }
+        frontStatus = Status.Training;
         openSkills.gameObject.SetActive(true);
         isNewGame = true;
         // EnemyGenerator.instance.EnemyParent = new GameObject("EnemyParent");
@@ -346,27 +615,24 @@ public class GameManager : MonoBehaviour
             }
             else
             {
-                // 对于 container 中的每个 skillPanel(Clone)，递归地设置其子对象的活跃状态
                 foreach (Transform subChild in child)
                 {
                     if (subChild.name == "skillPanel(Clone)")
                     {
-                        SetActiveRecursive(subChild.gameObject, true); // 激活 skillPanel(Clone) 及其所有子对象
+                        SetActiveRecursive(subChild.gameObject, true);  
                     }
                 }
             }
         }
 
-        // 确保 containerContainer 也保持正确的活跃状态
         SkillUI.instance.storePanel.SetActive(true);
         SkillUI.instance.containerContainer.SetActive(true);
         foreach (GameObject container in SkillUI.instance.skillContainers)
         {
-            container.SetActive(true); // 确保这些特定容器始终是活跃的
+            container.SetActive(true); 
         }
     }
 
-// 递归设置 GameObject 及其所有子对象的活跃状态，除非对象名为 "Image"
     void SetActiveRecursive(GameObject obj, bool active)
     {
         if (obj.name != "Image")
@@ -382,6 +648,7 @@ public class GameManager : MonoBehaviour
 
     public void StartFromLoad()
     {
+        frontStatus = Status.Game;
         isNewGame = false;
         EnemyGenerator.instance.EnemyParent = new GameObject("EnemyParent");
         Time.timeScale = 1;
@@ -447,7 +714,7 @@ public class GameManager : MonoBehaviour
 
     public void SaveData()
     {
-        Debug.Log("Save data");
+         ;
         List<EnemyData> enemyDatas = new List<EnemyData>();
         GameObject enemyParent = EnemyGenerator.instance.EnemyParent;
         for(int i = 0; i < enemyParent.transform.childCount; i++)
@@ -469,12 +736,23 @@ public class GameManager : MonoBehaviour
         UIManager.instance.GameCanvas.enabled = true;
         UIManager.instance.PauseCanvas.enabled = false;
         UIManager.instance.OverCanvas.enabled = false;
-        // curStatus = Status.Game;
+        if (frontStatus==Status.Game)
+        {
+            curStatus = Status.Game;
+        }else if (frontStatus==Status.Training)
+        {
+            currentStatus = Status.Training;
+        }
         Time.timeScale = 1;
+        // SwitchGameStatus(Status.Game);
+        // currentStatus = Status.Game;
+        // curStatus = Status.Game;
     }
+
+    public Status frontStatus = Status.Game;
     public void PauseGame()
     {
-        Debug.Log(currentStatus);
+         
         if(currentStatus == Status.Game)
         {
             SwitchGameStatus(Status.Pause);
@@ -487,12 +765,12 @@ public class GameManager : MonoBehaviour
             Time.timeScale = 1;
         }else if(currentStatus == Status.Pause&& currentStatus == Status.Game)
         {
-            Debug.Log("切换到:"+Status.Game);
+             
             SwitchGameStatus(Status.Game);
             Time.timeScale = 1;
         }else if(currentStatus == Status.Pause&& currentStatus == Status.Training)
         {
-            Debug.Log("切换到 :"+Status.Training);
+             
 
             SwitchGameStatus(Status.Training);
             Time.timeScale = 1;
@@ -500,26 +778,27 @@ public class GameManager : MonoBehaviour
     }
     public void GameOver()
     {
+        frontStatus = currentStatus;
         SwitchGameStatus(Status.Over);
-        Debug.Log("GameOver");
+         ;
         StopAllCoroutines();
 
         GameObject tempEP = EnemyGenerator.instance.EnemyParent;
-        if (tempEP != null) // 检查 EnemyParent 是否存在
+        if (tempEP != null)  
         {
             for(int i = 0; i < tempEP.transform.childCount; i++)
             {
                 GameObject child = tempEP.transform.GetChild(i).gameObject;
-                if (child != null) // 检查每个子对象是否存在 
+                if (child != null) 
                 {
                     Animator animator = child.GetComponent<Animator>();
-                    if (animator != null) // 检查 Animator 组件是否存在
+                    if (animator != null) 
                     {
                         animator.SetTrigger("Lose");
                     }
 
                     NavMeshAgent agent = child.GetComponent<NavMeshAgent>();
-                    if (agent != null) // 检查 NavMeshAgent 组件是否存在
+                    if (agent != null)  
                     {
                         agent.speed = 0;
                     }
@@ -534,10 +813,10 @@ public class GameManager : MonoBehaviour
 
 
     //TO DO
-    private void GameWin()
+    public void GameWin()
     {
         SwitchGameStatus(Status.Over);
-        Debug.Log("Win");
+         ;
         StopAllCoroutines();
         Time.timeScale = 0;
     }
@@ -547,50 +826,15 @@ public class GameManager : MonoBehaviour
         PlayerPrefsUtil.DeleteAllPrefs();
 
     }
-    public void BackToMenu()
-    {
-        openSkills.gameObject.SetActive(false);
-
-        SwitchGameStatus(Status.Menu);
-        // TO DO
-        AudioManager.instance.SwitchBGM(-1);
-        StopAllCoroutines();
-        Time.timeScale = 1;
-        Destroy(Player);
-        if (EnemyGenerator.instance.EnemyParent != null)
-        {
-            Destroy(EnemyGenerator.instance.EnemyParent);
-        }
-
-        Destroy(BossControllerTraining.instance.temp);
-        Transform enemyBars = UIManager.instance.enemyBarsUI.transform;
-        for(int i = 0;i < enemyBars.childCount; i++)
-        {
-            Destroy(enemyBars.GetChild(i).gameObject);
-        }
-//
-        UIManager.instance.openSkills.SetEnabled(true);
-        SkillUI.instance.SetActiveRecursively(SkillUI.instance.storePanel, false);
-        ObstacleGenerator.insatance.mapOccupied = new bool[ObstacleGenerator.insatance.mapSize, ObstacleGenerator.insatance.mapSize];
-        foreach (GameObject obstacle in ObstacleGenerator.insatance.generatedObstacles)
-        {
-            if (obstacle!=null)
-            {
-                 Destroy(obstacle);
-            }
-        }
-        ObstacleGenerator.insatance.generatedObstacles.Clear();
-        if (SkillCoinManager.instance.currentSkillCoin!=null)
-        {
-            Destroy(SkillCoinManager.instance.currentSkillCoin);
-        }
-    }
+    
 
     public void ReStart()
     {
         Destroy(Player);
-        Destroy(EnemyGenerator.instance.EnemyParent);
-        Destroy(EnemyGenerator.instance.EnemyParentTraining);
+        // Destroy(EnemyGenerator.instance.EnemyParent);
+        // Destroy(EnemyGenerator.instance.EnemyParentTraining);
+        EnemyGenerator.instance.EnemyParent.gameObject.SetActive(false);
+        EnemyGenerator.instance.EnemyParentTraining.gameObject.SetActive(false);
         Transform enemyBars = UIManager.instance.enemyBarsUI.transform;
         for (int i = 0; i < enemyBars.childCount; i++)
         {
@@ -599,11 +843,10 @@ public class GameManager : MonoBehaviour
 
         StartGame();
     }
-
+//  qads
     public void SwitchGameStatus(Status nextStatus)
     {
-        Debug.Log("next:!!! "+nextStatus);
-
+       
         switch (nextStatus)
         {
             case Status.Menu:
@@ -642,7 +885,7 @@ public class GameManager : MonoBehaviour
                 UIManager.instance.PauseCanvas.enabled = true;
                 UIManager.instance.OverCanvas.enabled = false;
                 curStatus = Status.Pause;
-                Debug.Log("到pause");
+                 ;
                 break;
             // 
             case Status.Over:

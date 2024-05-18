@@ -21,6 +21,7 @@ public class SkillUI : MonoBehaviour
     public Button OpenTrain;
 
     public GameObject[] skillContainers;
+    public GameObject[] skillContainersTraining;
     public GameObject containerContainer; // The entire store pane l
 
     public ScrollRect ownedScrollRect;
@@ -41,7 +42,7 @@ public class SkillUI : MonoBehaviour
         PopulateSkillPanels();
         storePanel.SetActive(false); // Ensure the store is hidden at game start
         clearButton.onClick.AddListener(ClearSkillContainers);
-        clearButtonTrain.onClick.AddListener(ClearSkillContainers);
+        clearButtonTrain.onClick.AddListener(ClearSkillContainersTrain);
         LoadContainerState(); // Load containers state at start
         if ((GameManager.instance.curStatus == Status.Training))
         {
@@ -61,6 +62,8 @@ public class SkillUI : MonoBehaviour
 
     public void ToggleSkillStore()
     {
+        SkillUI.instance.SaveContainerState();
+
         bool isActive = !storePanel.activeSelf; // Determine the new active state based on the current state
         SetActiveRecursively(storePanel, isActive);
     }
@@ -101,7 +104,7 @@ public class SkillUI : MonoBehaviour
 
     void PopulateSkillPanels()
     {
-        Debug.Log("来时!!! ");
+         ;
         
             // Clear existing panels to prevent duplication
             foreach (Transform child in ownedSkillsPanel) Destroy(child.gameObject);
@@ -110,15 +113,14 @@ public class SkillUI : MonoBehaviour
             // Populate the owned and available skill panels
             foreach (var skill in SkillManager.instance.ownedSkills)
             {
-                Debug.Log("走到1");
+                 ;
 
                 foreach (var ownedSkill in SkillManager.instance.ownedSkills)
                 {
-                    Debug.Log(ownedSkill.name + ", " + ownedSkill.cost + ", " + ownedSkill.isOwned + ", " +
-                              ownedSkill.isFree + ", " + ownedSkill.icon);
+                     
                 }
 
-                Debug.Log("???");
+                 ;
                 CreateSkillPanel(skill, ownedSkillsPanel, false);
             }
 
@@ -126,14 +128,13 @@ public class SkillUI : MonoBehaviour
             {
                 foreach (var ownedSkill in SkillManager.instance.availableSkills)
                 {
-                    Debug.Log(ownedSkill.name + ", " + ownedSkill.cost + ", " + ownedSkill.isOwned + ", " +
-                              ownedSkill.isFree + ", " + ownedSkill.icon);
+                     
                 }
 
                 CreateSkillPanel(skill, availableSkillsPanel, true);
             }
        //
-            Debug.Log("走到2");
+             ;
 
             // Populate the owned and available skill panels
             foreach (var skill in SkillManager.instance.ownedSkills)
@@ -155,13 +156,12 @@ public class SkillUI : MonoBehaviour
         Image skillImage = panel.transform.Find("SkillImage").GetComponent<Image>();
         nameText.text = skill.name;
 
-        Debug.Log("设置Training panel");
-        // 直接使用 Sprite
+         ;
         if (skill.icon != null)
         {
             var skillByName = SkillManager.instance.GetSkillByName(skill.name);
-            Debug.Log(skillByName.icon.GetType());
-            Debug.Log(skillImage.sprite.GetType());
+             
+             
             skillImage.sprite = skillByName.icon;
         }
         
@@ -170,7 +170,6 @@ public class SkillUI : MonoBehaviour
             Debug.LogError("Sprite is missing for skill: " + skill.name);
         }
 
-        // 添加按钮组件和监听事件
         Button button = skillImage.gameObject.AddComponent<Button>();
         if (isPurchasable)
         {
@@ -187,10 +186,9 @@ public class SkillUI : MonoBehaviour
     }
 
 
-    void SaveContainerState()
+    public void SaveContainerState()
     {
-        
-            Debug.Log("开始保存");
+             ;
             SkillContainerData[] containerData = new SkillContainerData[skillContainers.Length];
             for (int i = 0; i < skillContainers.Length; i++)
             {
@@ -198,50 +196,54 @@ public class SkillUI : MonoBehaviour
                 if (container != null)
                 {
                     var skillPanel = container.transform.Find("skillPanel(Clone)");
-                    if (skillPanel != null) // 确保skillPanel存在
+                    if (skillPanel != null) 
                     {
-                        Debug.Log("找到skillPanel");
+                         ;
                         var skillImage = skillPanel.Find("SkillImage");
                         if (skillImage != null)
                         {
-                            var text = skillImage.Find("name").GetComponent<Text>(); // 假设子对象的名称是 "Name"
+                            var text = skillImage.Find("name").GetComponent<Text>(); 
                             if (text != null)
                             {
                                 var skillName = text.text;
-                                Debug.Log(skillName);
-                                Debug.Log("找到后添加" + i);
+                                 
+                                 
                                 containerData[i] = new SkillContainerData { skillName = skillName };
-                                Debug.Log(containerData[i].skillName);
+                                 
                             }
                         }
                         else
                         {
-                            Debug.Log("无法添加" + i);
+                             
 
-                            // 如果Image组件或sprite为空，则记录空字符串或null
                             containerData[i] = new SkillContainerData { skillName = "" };
                         }
                     }
                 }
                 else
                 {
-                    Debug.Log("没找到panel" + i);
-                    // 如果没有找到skillPanel，则记录空字符串或null 
+                     
                     containerData[i] = new SkillContainerData { skillName = "" };
                 }
             }
             if (!(GameManager.instance.curStatus == Status.Training))
             {
 
-            // 将技能容器数据序列化为JSON字符串并保存
             string jsonData = JsonUtility.ToJson(new SkillContainerDataArray { data = containerData });
-            Debug.Log("JSON Data: " + jsonData);
-            Debug.Log("保存技能+" + jsonData);
-            Debug.Log(containerData);
+
+
+            if (onceLoadData!=null)
+            {
+                PlayerPrefs.SetString("SkillContainerData", onceLoadData);
+                PlayerPrefs.Save();
+                return;
+            }
+            Debug.Log(jsonData);
+
             PlayerPrefs.SetString("SkillContainerData", jsonData);
             PlayerPrefs.Save();
             string jsonData2 = PlayerPrefs.GetString("SkillContainerData", "");
-            Debug.Log("!!!!+" + jsonData2);
+             
         }
     }
 
@@ -257,13 +259,23 @@ public class SkillUI : MonoBehaviour
         public SkillContainerData[] data;
     }
 
-    void LoadContainerState()
+    public string onceLoadData ;
+    public void LoadContainerState()
     {
         string jsonData = PlayerPrefs.GetString("SkillContainerData", "");
-        Debug.Log("Loaded JSON Data : " + jsonData);
+        onceLoadData = jsonData;
+        Debug.Log(jsonData);
         if (!string.IsNullOrEmpty(jsonData))
         {
             SkillContainerDataArray containerDataArray = JsonUtility.FromJson<SkillContainerDataArray>(jsonData);
+            Debug.Log(containerDataArray);
+
+            for (int i = 0; i < 4; i++)
+            {
+                DestroyObjectsWithNameInContainers("skillPanel(Clone)");
+
+                // skillContainers[i] = new GameObject("SkillContainer" + (i + 1));
+            }
             if (containerDataArray != null && containerDataArray.data != null)
             {
                 for (int i = 0; i < containerDataArray.data.Length; i++)
@@ -275,17 +287,32 @@ public class SkillUI : MonoBehaviour
                         if (skill != null && i < skillContainers.Length)
                         {
                             InstantiateSkillInContainer(skill, skillContainers[i]);
-                            if (skill!=null&&PlayerController.instance!=null)
+                            if (skill != null && PlayerController.instance != null)
                             {
-                                PlayerController.instance.skillCanAttack.Add(skill.name, true);
-                                PlayerController.instance.skillCanAttackIsStart.Add(skill.name, false);
+                                if (!PlayerController.instance.skillCanAttack.ContainsKey(skill.name))
+                                {
+                                    PlayerController.instance.skillCanAttack.Add(skill.name, true);
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"Skill {skill.name} already exists in skillCanAttack dictionary");
+                                }
 
+                                if (!PlayerController.instance.skillCanAttackIsStart.ContainsKey(skill.name))
+                                {
+                                    PlayerController.instance.skillCanAttackIsStart.Add(skill.name, false);
+                                }
+                                else
+                                {
+                                    Debug.LogWarning($"Skill {skill.name} already exists in skillCanAttackIsStart dictionary");
+                                }
                             }
                         }
                     }
                 }
             }
         }
+
     }
 
     bool IsSkillAlreadyAdded(Skill skill)
@@ -295,12 +322,12 @@ public class SkillUI : MonoBehaviour
             if (container.transform.childCount > 0)
             {
                 var skillPanel = container.transform.Find("skillPanel(Clone)");
-                if (skillPanel != null) // 确保skillPanel存在
+                if (skillPanel != null)  
                 {
                     var skillImage = skillPanel.Find("SkillImage");
                     if (skillImage != null)
                     {
-                        var text = skillImage.Find("name").GetComponent<Text>(); // 假设子对象的名称是 "Name"
+                        var text = skillImage.Find("name").GetComponent<Text>();  
                         if (text != null && text.text == skill.name)
                         {
                             return true;
@@ -315,67 +342,78 @@ public class SkillUI : MonoBehaviour
 
     void AddSkillToContainer(Skill skill)
     {
-        Debug.Log("监听");
         foreach (GameObject container in skillContainers)
         {
-            Debug.Log(container.transform.childCount);
-            Debug.Log("dasdasda   "+skillContainers.Length);
-            if (container.transform.Find("skillPanel(Clone)/SkillImage/name")!=null)
+            if (container != null)
             {
-                var text = container.transform.Find("skillPanel(Clone)/SkillImage/name").gameObject.GetComponent<Text>().text;
-            
-                if ((container.transform.childCount == 0||text=="") && !IsSkillAlreadyAdded(skill))
+                Transform skillPanelTransform = container.transform.Find("skillPanel(Clone)/SkillImage/name");
+                if (skillPanelTransform != null)
                 {
-                    Debug.Log("添加技能");
+                    Text textComponent = skillPanelTransform.gameObject.GetComponent<Text>();
+                    if (textComponent != null)
+                    {
+
+                        string text = textComponent.text;
+                        if ((container.transform.childCount == 0 || string.IsNullOrEmpty(text)) && !IsSkillAlreadyAdded(skill))
+                        {
+                            InstantiateSkillInContainer(skill, container);
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"Text component not found in {skillPanelTransform.gameObject.name}");
+                    }
+                }
+                else
+                {
                     InstantiateSkillInContainer(skill, container);
+                    SetActiveRecursively(container, true);
+                
+                    if (PlayerController.instance != null)
+                    {
+
+                        PlayerController.instance.equippedSkills.Add(skill);
+                        PlayerController.instance.UpdateEquippedSkills();
+                    }
+                    else
+                    {
+                        Debug.LogWarning("PlayerController.instance is null");
+                    }
                     break;
                 }
             }
             else
             {
-                Debug.Log("添加技能 "+skill.name);
-                InstantiateSkillInContainer(skill, container);
-                SetActiveRecursively(container, true);
-                
-                PlayerController.instance.equippedSkills.Add(skill);
-
-                
-                
-                break;
+                Debug.LogWarning("Skill container is null");
             }
-           
         }
     }
 
+
+    public List<string> trainingSkillName = new List<string>(4);
+
     void InstantiateSkillInContainer(Skill skill, GameObject container)
     {
+
         // if (skill.icon == null || skill.icon.texture == null) {
-        //     Debug.LogError("尝试使用已被销毁的 Sprite"); 
-        //     return; // 直接返回避免进一步错误
         // }
         GameObject skillObj = Instantiate(skillPanelPrefab, container.transform);
         RectTransform rectTransform = skillObj.GetComponent<RectTransform>();
         rectTransform.SetParent(container.transform, false);
 
-        // 设置为常规缩放和位置调整
         rectTransform.localScale = Vector3.one;
         rectTransform.localRotation = Quaternion.identity;
 
-        // 将锚点和轴心设置在父对象的右下角
         rectTransform.anchorMin = new Vector2(1, 0);
         rectTransform.anchorMax = new Vector2(1, 0);
         rectTransform.pivot = new Vector2(1, 0);
 
-        // 调整位置偏移量
-        rectTransform.anchoredPosition = new Vector2(-10, 10); // 可
+        rectTransform.anchoredPosition = new Vector2(-10, 10);  
         Image image = skillObj.transform.Find("SkillImage").GetComponent<Image>();
         if (image != null)
         {
             image.sprite = skill.icon;
-        }
-        else
-        {
-            Debug.LogError("找不到 Image 组件");
         }
 
         skillObj.transform.Find("SkillImage/name").GetComponent<Text>().text = skill.name;
@@ -388,26 +426,83 @@ public class SkillUI : MonoBehaviour
             skillImage.SetActive(true); // Activate the SkillImage if it was inactive
         }
 
+        if (!(GameManager.instance.curStatus == Status.Training))
+        {
+            
+            SaveContainerState(); // Save state after clearing
+            return;
+        }
+        PlayerController.instance.DelayedUpdateEquippedSkills(1f);
+        trainingSkillName.Add(skill.name);
         // Optionally, add a click event to remove from container or other functionality
-        SaveContainerState(); // Save state after adding skill
+        // DestroyObjectsWithNameInContainers("skillPanel(Clone)");
+        // LoadContainerState();
     }
-
-    void ClearSkillContainers()
+    public void DestroyObjectsWithNameInContainers(string objectName)
     {
         foreach (GameObject container in skillContainers)
         {
-            foreach (Transform child in container.transform)
+            if (container != null)
             {
-                Destroy(child.gameObject);
+                Transform[] allChildren = container.GetComponentsInChildren<Transform>(true);
+                foreach (Transform child in allChildren)
+                {
+                    if (child.gameObject.name == objectName)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
+            }
+            else
+            {
+                Debug.LogWarning("One of the skill containers is null");
             }
         }
+    }
+    void ClearSkillContainers()
+    {
+        // foreach (GameObject container in skillContainers)
+        // {
+        //     foreach (Transform child in container.transform)
+        //     {
+        //         Destroy(child.gameObject);
+        //     }
+        // }
+        DestroyObjectsWithNameInContainers("skillPanel(Clone)");
+        SaveContainerState();
 
-        skillContainers = new GameObject[4];
-        for (int i = 0; i < skillContainers.Length; i++)
-        {
-            skillContainers[i] = new GameObject("SkillContainer" + (i + 1));
-        }
-        SaveContainerState(); // Save state after clearing
+        // for (int i = 0; i < skillContainers.Length; i++)
+        // {
+        //     if (skillContainers[i]!=null)
+        //     {
+        //         skillContainers[i] = new GameObject("SkillContainer" + (i + 1));
+        //     }
+        // }
+        // SaveContainerState(); // Save state after clearing
+        // // SkillUI.instance.LoadContainerState();
+        // LoadContainerState();
+    }void ClearSkillContainersTrain()
+    {
+        // foreach (GameObject container in skillContainers)
+        // {
+        //     foreach (Transform child in container.transform)
+        //     {
+        //         Destroy(child.gameObject);
+        //     }
+        // }
+        DestroyObjectsWithNameInContainers("skillPanel(Clone)");
+        PlayerController.instance.DelayedUpdateEquippedSkills(1f);
+
+        // for (int i = 0; i < skillContainers.Length; i++)
+        // {
+        //     if (skillContainers[i]!=null)
+        //     {
+        //         skillContainers[i] = new GameObject("SkillContainer" + (i + 1));
+        //     }
+        // }
+        // SaveContainerState(); // Save state after clearing
+        // // SkillUI.instance.LoadContainerState();
+        // LoadContainerState();
     }
 
     public void UpdateSkillPanels()

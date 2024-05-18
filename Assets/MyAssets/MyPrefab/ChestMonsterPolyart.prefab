@@ -908,6 +908,8 @@ MonoBehaviour:
   isGetHit: 0
   timer: 0
   GetHitAS: {fileID: 0}
+  staticPrefab: {fileID: 6950423379102812, guid: 6fa139b8f6ebef948948f21b825b6806, type: 3}
+  bleedPrefab: {fileID: 3021877135130851492, guid: 9f340188660d88a49983d91a4ae19c0a, type: 3}
   isDead: 0
   deadTimer: 0
 --- !u!82 &1309093050329359909

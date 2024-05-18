@@ -52,7 +52,6 @@ public class PlayerController : PlayerMovement
     public Dictionary<string, bool> skillCanAttack = new Dictionary<string, bool>(5);
     public Dictionary<string, bool> skillCanAttackIsStart = new Dictionary<string, bool>(5);
     
-    // 设置技能冷却时间
     public void SetSkillCooldown(string skillName, float cooldownTime)
     {
         if (skillCooldowns.ContainsKey(skillName))
@@ -65,7 +64,6 @@ public class PlayerController : PlayerMovement
         }
     }
 
-    // 获取技能冷却时间
     public float GetSkillCooldown(string skillName)
     {
         if (skillCooldowns.ContainsKey(skillName))
@@ -74,7 +72,7 @@ public class PlayerController : PlayerMovement
         }
         else
         {
-            return 0f; // 如果找不到技能名称，则返回默认值
+            return 0f; 
         }
     }
 
@@ -91,16 +89,16 @@ public class PlayerController : PlayerMovement
         StartCoroutine(SPCheck());
 
         StartCoroutine(DelayedUpdateEquippedSkills(1.0f));
-        Debug.Log("初始化");
+         ;
     }
 
-    IEnumerator DelayedUpdateEquippedSkills(float delay)
+    public IEnumerator DelayedUpdateEquippedSkills(float delay)
     {
-        yield return new WaitForSeconds(delay); // 等待指定的延迟时间
-        UpdateEquippedSkills(); // 执行 UpdateEquippedSkills 方法
+        yield return new WaitForSeconds(delay);  
+        UpdateEquippedSkills();  
     }
 
-    void UpdateEquippedSkills()
+    public void UpdateEquippedSkills()
     {
         equippedSkills.Clear();
         var flag = false;
@@ -125,7 +123,7 @@ public class PlayerController : PlayerMovement
             if (find != null)
             {
                 var subtext = find.GetComponent<Text>();
-                Debug.Log("!!!2 " + subtext.text);
+                 
                 if (subtext != null)
                 {
                     Skill skill = SkillManager.instance.GetSkillByName(subtext.text);
@@ -142,114 +140,143 @@ public class PlayerController : PlayerMovement
         }
 
         if (equippedSkills.Count > 0)
-            currentSkill = equippedSkills[0]; // 默认选中第一个技能
+            currentSkill = equippedSkills[0];  
            
         }
     }
 
-    public void HandleSkillSelection()
+public void HandleSkillSelection()
+{
+    if (GameManager.instance.curStatus == Status.Game)
     {
-        if (GameManager.instance.curStatus == Status.Game)
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1) && equippedSkills.Count > 0)
+            if (equippedSkills.Count > 0)
             {
                 setImageActive(0);
-                Debug.Log("设置为1");
                 currentSkill = equippedSkills[0];
                 selectedSkillIndex = 0;
-
-                Debug.Log(equippedSkills[0].name);
             }
-
-            if (Input.GetKeyDown(KeyCode.Alpha2) && equippedSkills.Count > 1)
+            else
             {
-                setImageActive(1);
-
-                Debug.Log("设置为2");
-                currentSkill = equippedSkills[1];
-                selectedSkillIndex = 1;
-
-                Debug.Log(equippedSkills[1].name);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha3) && equippedSkills.Count > 2)
-            {
-                setImageActive(2);
-
-                Debug.Log("设置为3");
-                currentSkill = equippedSkills[2];
-                selectedSkillIndex = 2;
-
-                Debug.Log(equippedSkills[2].name);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha4) && equippedSkills.Count > 3)
-            {
-                setImageActive(3);
-
-                Debug.Log("设置为4");
-                currentSkill = equippedSkills[3];
-                selectedSkillIndex = 3;
-
-                Debug.Log(equippedSkills[3].name);
-            }
-        }else if (GameManager.instance.curStatus == Status.Training)
-        {
-            if (Input.GetKeyDown(KeyCode.Alpha1) )
-            {
-                setImageActive(0);
-                Debug.Log("设置为1");
-                currentSkill = equippedSkills[0];
-                selectedSkillIndex = 0;
-
-                Debug.Log(equippedSkills[0].name);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                setImageActive(1);
-
-                Debug.Log("设置为2");
-                currentSkill = equippedSkills[1];
-                selectedSkillIndex = 1;
-
-                Debug.Log(equippedSkills[1].name);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                setImageActive(2);
-
-                Debug.Log("设置为3");
-                currentSkill = equippedSkills[2];
-                selectedSkillIndex = 2;
-
-                Debug.Log(equippedSkills[2].name);
-            }
-
-            if (Input.GetKeyDown(KeyCode.Alpha4) )
-            {
-                setImageActive(3);
-
-                Debug.Log("设置为4");
-                currentSkill = equippedSkills[3];
-                selectedSkillIndex = 3;
-
-                Debug.Log(equippedSkills[3].name);
+                Debug.LogWarning("No skill equipped in slot 1");
             }
         }
-        
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            if (equippedSkills.Count > 1)
+            {
+                setImageActive(1);
+                currentSkill = equippedSkills[1];
+                selectedSkillIndex = 1;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 2");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            if (equippedSkills.Count > 2)
+            {
+                setImageActive(2);
+                currentSkill = equippedSkills[2];
+                selectedSkillIndex = 2;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 3");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            if (equippedSkills.Count > 3)
+            {
+                setImageActive(3);
+                currentSkill = equippedSkills[3];
+                selectedSkillIndex = 3;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 4");
+            }
+        }
     }
+    else if (GameManager.instance.frontStatus == Status.Training)
+    {
+
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            if (equippedSkills.Count > 0)
+            {
+                Debug.Log("Skill 1 selected");
+                setImageActive(0);
+                currentSkill = equippedSkills[0];
+                selectedSkillIndex = 0;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 1");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            if (equippedSkills.Count > 1)
+            {
+                setImageActive(1);
+                currentSkill = equippedSkills[1];
+                selectedSkillIndex = 1;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 2");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            if (equippedSkills.Count > 2)
+            {
+                setImageActive(2);
+                currentSkill = equippedSkills[2];
+                selectedSkillIndex = 2;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 3");
+            }
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            if (equippedSkills.Count > 3)
+            {
+                setImageActive(3);
+                currentSkill = equippedSkills[3];
+                selectedSkillIndex = 3;
+            }
+            else
+            {
+                Debug.LogWarning("No skill equipped in slot 4");
+            }
+        }
+    }
+}
+
 
     void setImageActive(int index)
     {
         clearImageActive();
-        Debug.Log("开始设置");
+         ;
         var imageGameObject = SkillUI.instance.skillContainers[index].transform
             .Find("skillPanel(Clone)/SkillImage/Image").gameObject;
         if (imageGameObject != null)
         {
-            imageGameObject.SetActive(true); // 激活 GameObject
+            imageGameObject.SetActive(true); 
         }
         else
         {
@@ -267,7 +294,7 @@ public class PlayerController : PlayerMovement
                     .Find("skillPanel(Clone)/SkillImage/Image").gameObject;
                 if (imageGameObject != null)
                 {
-                    imageGameObject.SetActive(false); // 激活 GameObject
+                    imageGameObject.SetActive(false); 
                 }
                 else
                 {
@@ -318,7 +345,7 @@ public class PlayerController : PlayerMovement
         pData.CriticalRate = 30;
         pData.JumpTime = 1;
         pData.MoveSpeed = 5;
-
+        
         pData.CurExp = 0;
         pData.MaxExp = GameManager.instance.experienceToNextLevel[pData.Level - 1];
         return pData;
@@ -327,8 +354,32 @@ public class PlayerController : PlayerMovement
     // Update is called once per frame
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            Debug.Log("!!!!!!!!!1");
+
+        }
         if ((GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
         {
+            Ray ray2 = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit2;
+    
+            // Cast the ray and check if it hits the ground
+            if (Physics.Raycast(ray2, out hit2, Mathf.Infinity, GroundLayer))
+            {
+                if (hit2.collider.tag == "Ground")
+                {
+                    // Calculate the direction from the player to the hit point
+                    Vector3 targetDirection = hit2.point - transform.position;
+                    targetDirection.y = 0; // Keep the direction strictly horizontal
+
+                    // Create a rotation from the direction
+                    Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+
+                    // Smoothly rotate towards the target point
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10);
+                }
+            }
             HandleSkillSelection();
             SkillFunctions.instance.HandleSkillUsage(currentSkill);
 
@@ -382,7 +433,6 @@ public class PlayerController : PlayerMovement
 
             if (playerData.ShieldValue <= 0)
             {
-                // 停止护盾特效
                 if (SkillFunctions.instance.shieldParticles != null)
                 {
                     SkillFunctions.instance.shieldParticles.Stop();
@@ -397,8 +447,8 @@ public class PlayerController : PlayerMovement
 
                 if (!canAttack.Value&& !skillCanAttackIsStartCopy[canAttack.Key])
                 {
-                    Debug.Log("!SAD:  "+canAttack.Key);
-                    Debug.Log("!SAD:  "+canAttack.Value);
+                     
+                     
                     // skillCanAttack.Add(canAttack.Key+"isStart",true);
 
                     switch (canAttack.Key)
@@ -470,12 +520,12 @@ public class PlayerController : PlayerMovement
     {
         if (other.gameObject.CompareTag("SkillCoin"))
         {
-            Debug.Log("Collected a skill coin.");
+             ;
             SkillCoinManager.instance.CoinCollected();
         }
         if (other.tag == "bossAttack"  )
         {
-            Debug.Log("激光攻击");
+             ;
             GetHurt(2);
         }
     }
@@ -562,7 +612,16 @@ public class PlayerController : PlayerMovement
     public void SetData(PlayerData data)
     {
         playerData = data;
-        curSP = data.MaxSp;
+        if (GameManager.instance.curStatus == Status.Game)
+        {
+            curSP = data.MaxSp;
+        }
+        else if (GameManager.instance.curStatus==Status.Training)
+        {
+            curSP =10000;
+
+        }
+
         maxJumpTimes = data.JumpTime;
         transform.position = data.Location;
     }

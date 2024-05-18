@@ -6,15 +6,15 @@ using Random = UnityEngine.Random;
 
 public class ObstacleGenerator : MonoBehaviour
 {
-    public static  ObstacleGenerator insatance;
+    public static  ObstacleGenerator instance;
     public int mapSize = 31;
     public bool[,] mapOccupied;
     private Vector3 centerPosition;
-    private bool isObstaclesGenerated = false;
+    public bool isObstaclesGenerated = false;
     public List<GameObject> generatedObstacles = new List<GameObject>(1000);
     public void Awake()
     {
-        insatance = this;
+        instance = this;
     }
 
     void Start()
@@ -41,7 +41,7 @@ public class ObstacleGenerator : MonoBehaviour
             PlaceCenterBlock();
             isObstaclesGenerated = true; 
         }
-        else if (!(GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training))
+        else if (!(GameManager.instance.curStatus == Status.Game||GameManager.instance.curStatus == Status.Training)&&GameManager.instance.curStatus != Status.Pause)
         {
             isObstaclesGenerated = false; 
         }
