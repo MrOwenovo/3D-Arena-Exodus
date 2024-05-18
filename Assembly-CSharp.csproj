@@ -13,7 +13,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{98895af2-c54c-5199-f8c3-e4ad825a4987}</ProjectGuid>
+    <ProjectGuid>{8d64962d-f8cc-e440-df4c-43a38e559aa4}</ProjectGuid>
     <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -337,7 +337,7 @@
  <HintPath>C:/Application/Programming/UnityHub/Editor/2020.3.17f1c1/Editor/Data/Managed/UnityEngine/UnityEditor.UnityConnectModule.dll</HintPath>
  </Reference>
  <Reference Include="Newtonsoft.Json">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/PackageCache/com.unity.nuget.newtonsoft-json@2.0.0/Runtime/Newtonsoft.Json.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/PackageCache/com.unity.nuget.newtonsoft-json@2.0.0/Runtime/Newtonsoft.Json.dll</HintPath>
  </Reference>
  <Reference Include="netstandard">
  <HintPath>C:/Application/Programming/UnityHub/Editor/2020.3.17f1c1/Editor/Data/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
@@ -685,43 +685,43 @@
  <HintPath>C:/Application/Programming/UnityHub/Editor/2020.3.17f1c1/Editor/Data/NetStandard/compat/2.0.0/shims/netfx/System.Xml.Serialization.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VSCode.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.VSCode.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.VisualStudio.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.VisualStudio.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.Timeline.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Timeline">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.Timeline.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEditor.UI">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/UnityEditor.UI.dll</HintPath>
  </Reference>
  <Reference Include="Unity.PlasticSCM.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.PlasticSCM.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.Rider.Editor">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/Unity.Rider.Editor.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
- <HintPath>C:/Users/lmq12/OneDrive/桌面/2/DogKnightAD/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
+ <HintPath>C:/Users/lmq12/OneDrive/桌面/2/Arena of the Condemned/Library/ScriptAssemblies/UnityEngine.UI.dll</HintPath>
  </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="NavMeshComponentsEditor.csproj">
-      <Project>{ae0ba04f-cdb2-ecaf-99a8-8e2aa69c4344}</Project>
+      <Project>{bead3e95-de09-ce74-12b1-6f715a1ac82a}</Project>
       <Name>NavMeshComponentsEditor</Name>
     </ProjectReference>
     <ProjectReference Include="NavMeshComponents.csproj">
-      <Project>{5ffc2058-dc8d-fd42-7cd5-3140e1c460d1}</Project>
+      <Project>{dfd94ca1-feb5-b309-6dd9-3c148f611dff}</Project>
       <Name>NavMeshComponents</Name>
     </ProjectReference>
   </ItemGroup>

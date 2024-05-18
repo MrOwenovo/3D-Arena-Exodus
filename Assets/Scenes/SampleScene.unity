@@ -374,11 +374,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 955959217}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 1059.9, y: -69.8}
+  m_AnchoredPosition: {x: 1150, y: 54}
   m_SizeDelta: {x: 1100, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &47425910
@@ -889,7 +889,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: -239}
+  m_AnchoredPosition: {x: -145, y: -85}
   m_SizeDelta: {x: 1100, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &102029087
@@ -925,25 +925,27 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\nFree Skills:\r\n \xB7 Attack:\r\n    \xB7 Short Press: Quick slash with
-    a short cooldown.\r\n    \xB7 Long Press: Charge to unleash a powerful attack
-    dealing four times the normal damage.\nPurchasable Attack Skills:\r\n \xB7 Bomb:\r\n\r   
+  m_Text: "\nFree Skills:\r\n \xB7 Attack:\r\n    \xB7 Description: Basic attack
+    with charge and critical hit probability\r\n    \xB7 Damage: 30\r\n    \xB7 Mana
+    Cost: 0\r\n    \xB7 Critical Hit Probability: 30% (Critical hit deals 60 damage)\r\n   
+    \xB7 Left Click (Short Press): Quick slash with a short cooldown\r\n    \xB7
+    Left Click (Long Press): Charged attack dealing four times the damage\r\n   
+    \xB7 Difficulty Level: Low\r\nPurchasable Attack Skills:\r\n \xB7 Bomb:\r\n   
     \xB7 Description: Throws a bomb that attaches to enemies and explodes after 2
-    seconds, dealing moderate damage.\r\n    \xB7 Mana Cost: Moderate\r.Cooldown:
-    Moderate.Cooldown: Moderate\r\n \xB7 Sword Throwing:\r\n    \xB7 Description:
-    Throws a dagger at long range, inflicting low damage.\r\n    \xB7 Mana Cost:
-    Low\r.Cooldown: Short\r\n \xB7 Bleed:\r\n    \xB7 Description: Area of Effect
-    (AoE) skill that causes bleeding effect on enemies within range, marked by a
-    bleeding icon,                         \n      delivering moderate damage.\r\n   
-    \xB7 Mana Cost: High\r.Cooldown: Moderate\r\n \xB7 Laser:\r\n    \xB7 Description:
-    Emits a laser that damages enemies and applies a static effect, indicated by
-    a static icon.\r\n    \xB7 Mana Cost: High\r.Cooldown: Moderate\r\nFunctional
-    Skills:\r\nResponsive:\r\n \xB7 Shield Awarded:\r\n    \xB7 Description: Grants
-    a shield with 50 points of durability, cannot be stacked.\r\n    \xB7 Mana Cost:
-    Moderate\r\nEnhanced:\r\n \xB7 Atk Up:\r\n    \xB7 Description: Temporarily increases
-    attack power by 50 for 5 seconds.\r\n    \xB7 Mana Cost: Moderate\r\n \xB7 Add
-    Maximum Health:\r\n    \xB7 Description: Increases current and maximum health
-    by 20.\rMana Cost: High\n"
+    seconds\r\n    \xB7 Damage: 924\r\n    \xB7 Cooldown: Medium\r\n    \xB7 Mana
+    Cost: 40\r\n    \xB7 Difficulty Level: Medium\r\n \xB7 Sword Throwing:\r\n   
+    \xB7 Description: Throws a dagger for long-range attack\r\n    \xB7 Damage: 81\r\n   
+    \xB7 Cooldown: Short\r\n    \xB7 Mana Cost: 20\r\n    \xB7 Difficulty Level:
+    Low\r\n \xB7 Bleed:\r\n    \xB7 Description: Releases an AoE skill causing bleeding
+    effect to enemies within range (marked by bleeding icon)\r\n    \xB7 Damage:
+    252\r\n    \xB7 Cooldown: High\r\n    \xB7 Mana Cost: 50\r\n    \xB7 Additional
+    Effect: Applies bleed element effect\r\n    \xB7 Difficulty Level: High\r\n \xB7
+    Laser:\r\n    \xB7 Description: Emits a laser that damages enemies and applies
+    a static effect (marked by static icon)\r\n    \xB7 Damage: 78\r\n    \xB7 Cooldown:
+    High\r\n    \xB7 Mana Cost: 50\r\n    \xB7 Additional Effect: Applies static
+    element effect\r\n    \xB7 Difficulty Level: High\r\n \xB7 Elemental Reaction:\r\n   
+    \xB7 When Bleed Icon and Static Icon appear together, they trigger an elemental
+    reaction\r\n    \xB7 Damage: 274.5\r\n    \xB7 Effect: Removes all element icons\r"
 --- !u!222 &102029088
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1664,6 +1666,90 @@ CanvasRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 221234006}
+  m_CullTransparentMesh: 1
+--- !u!1 &223974226
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 223974227}
+  - component: {fileID: 223974229}
+  - component: {fileID: 223974228}
+  m_Layer: 5
+  m_Name: text (1)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &223974227
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223974226}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 955959217}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 705, y: -131}
+  m_SizeDelta: {x: 1100, y: 1000}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &223974228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223974226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Material: {fileID: 0}
+  m_Color: {r: 0.4056604, g: 0.066972226, b: 0.066972226, a: 1}
+  m_RaycastTarget: 1
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  m_FontData:
+    m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
+    m_FontSize: 20
+    m_FontStyle: 0
+    m_BestFit: 0
+    m_MinSize: 0
+    m_MaxSize: 235
+    m_Alignment: 0
+    m_AlignByGeometry: 0
+    m_RichText: 1
+    m_HorizontalOverflow: 0
+    m_VerticalOverflow: 0
+    m_LineSpacing: 1
+  m_Text: "Functional Skills:\r\nResponsive:\r\n \xB7 Shield Awarded:\r\n    \xB7
+    Description: Grants a shield with 50 points of durability\r\n    \xB7 Mana Cost:
+    50\r\n    \xB7 Effect: Cannot be stacked\r\nEnhanced:\r\n \xB7 Atk Up:\r\n   
+    \xB7 Description: Temporarily increases attack power by 50 for 5 seconds\r\n   
+    \xB7 Mana Cost: 40\r\n \xB7 Add Maximum Health:\r\n    \xB7 Description: Increases
+    current and maximum health by 20\r\n    \xB7 Mana Cost: 70\r\n"
+--- !u!222 &223974229
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 223974226}
   m_CullTransparentMesh: 1
 --- !u!1 &229227356
 GameObject:
@@ -4249,7 +4335,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
   m_AnchoredPosition: {x: 473.99884, y: 106.997894}
-  m_SizeDelta: {x: 0, y: -537}
+  m_SizeDelta: {x: 0, y: -565}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &581021833
 MonoBehaviour:
@@ -5782,7 +5868,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: -149}
+  m_AnchoredPosition: {x: 10, y: -55}
   m_SizeDelta: {x: 1100, y: 1000}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &754688582
@@ -5807,7 +5893,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 30
+    m_FontSize: 26
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 0
@@ -7080,6 +7166,7 @@ RectTransform:
   - {fileID: 1691250340}
   - {fileID: 754688581}
   - {fileID: 102029086}
+  - {fileID: 223974227}
   - {fileID: 47425909}
   m_Father: {fileID: 0}
   m_RootOrder: 24
@@ -11250,7 +11337,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10.3, y: 383}
+  m_AnchoredPosition: {x: 10.3, y: 486}
   m_SizeDelta: {x: 400, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1691250341

@@ -109,6 +109,7 @@ public class SkillUI : MonoBehaviour
             // Clear existing panels to prevent duplication
             foreach (Transform child in ownedSkillsPanel) Destroy(child.gameObject);
             foreach (Transform child in availableSkillsPanel) Destroy(child.gameObject);
+            foreach (Transform child in availableSkillsPanelTraining) Destroy(child.gameObject);
 
             // Populate the owned and available skill panels
             foreach (var skill in SkillManager.instance.ownedSkills)

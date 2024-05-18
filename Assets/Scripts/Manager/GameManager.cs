@@ -207,7 +207,21 @@ public class GameManager : MonoBehaviour
     //     // yield return new WaitForSeconds(delay);
     //     SkillUI.instance.LoadContainerState();
     // }
+    public void SetCanvas2Inactive()
+    {
+        GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
+        foreach (GameObject obj in allObjects)
+        {
+            if (obj.name == "Canvas2")
+            {
+                obj.SetActive(false);
+                return;  
+            }
+        }
+        Debug.LogWarning("Canvas2 not found in the scene.");
+    }
 
+ 
   public void BackToMenu()
 {
     if (SkillUI.instance != null)
@@ -218,8 +232,8 @@ public class GameManager : MonoBehaviour
         }
     }
 
-  
-    
+
+    SetCanvas2Inactive();
     DestroyAllObjectsWithName("skillPanel(Clone)");
 
     // Start coroutine to delay LoadContainerState
